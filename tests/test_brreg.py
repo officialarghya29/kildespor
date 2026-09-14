@@ -11,7 +11,6 @@ from kildespor.connectors.brreg import (
     orgnr_checksum_valid,
 )
 
-
 RECORD_A = {
     "virksomhet": {"organisasjonsnummer": "925820148"},
     "regnskapsperiode": {"fraDato": "2025-01-01", "tilDato": "2025-12-31"},

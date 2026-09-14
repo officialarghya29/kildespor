@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import json
-import os
 from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
 
 from .models import CompanyProfile
 
@@ -46,7 +44,7 @@ def load_profiles(profiles_dir: str) -> dict[str, CompanyProfile]:
     return out
 
 
-def latest_run_dir(base_dir: str, exclude: Optional[str] = None) -> Optional[str]:
+def latest_run_dir(base_dir: str, exclude: str | None = None) -> str | None:
     """Find the most recent run_* directory under base_dir (for diffing)."""
     base = Path(base_dir)
     if not base.is_dir():

@@ -10,8 +10,9 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass, field as dc_field
-from typing import Any, Optional
+from dataclasses import dataclass
+from dataclasses import field as dc_field
+from typing import Any, ClassVar
 from urllib.parse import urlparse
 
 import httpx
@@ -28,8 +29,8 @@ class HttpResponse:
     status: int
     content: bytes
     content_type: str = ""
-    snapshot_id: Optional[str] = None
-    snapshot_path: Optional[str] = None
+    snapshot_id: str | None = None
+    snapshot_path: str | None = None
     elapsed_ms: int = 0
 
     def json(self) -> Any:
@@ -64,10 +65,10 @@ class PoliteClient:
     Definitive 4xx responses (404 etc.) are never retried.
     """
 
-    RETRYABLE_STATUSES = {429, 500, 502, 503, 504}
-    MAX_ATTEMPTS = 3
+    RETRYABLE_STATUSES: ClassVar[set[int]] = {429, 500, 502, 503, 504}
+    MAX_ATTEMPTS: ClassVar[int] = 3
 
-    def __init__(self, snapshot_dir: Optional[str] = None):
+    def __init__(self, snapshot_dir: str | None = None):
         self._client = httpx.Client(
             headers={
                 "User-Agent": CONFIG.user_agent,
@@ -86,10 +87,10 @@ class PoliteClient:
         self,
         url: str,
         *,
-        params: Optional[dict[str, Any]] = None,
-        headers: Optional[dict[str, str]] = None,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
         snap: bool = True,
-    ) -> Optional[HttpResponse]:
+    ) -> HttpResponse | None:
         """GET with budget enforcement, throttling, retries, and snapshots."""
         for attempt in range(1, self.MAX_ATTEMPTS + 1):
             host = urlparse(url).netloc
@@ -115,10 +116,9 @@ class PoliteClient:
         self,
         url: str,
         *,
-        params: Optional[dict[str, Any]] = None,
-        headers: Optional[dict[str, str]] = None,
-    ) -> Optional[HttpResponse]:
-        host = urlparse(url).netloc
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> HttpResponse | None:
         wait = self.min_interval - (time.monotonic() - self._last_request_ts)
         if wait > 0:
             time.sleep(wait)
@@ -178,4 +178,4 @@ def _normalise_json(raw: bytes) -> bytes:
         return raw
 
 
-__all__ = ["PoliteClient", "HttpResponse", "Budget"]
+__all__ = ["Budget", "HttpResponse", "PoliteClient"]

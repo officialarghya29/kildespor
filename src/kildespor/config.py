@@ -6,7 +6,7 @@ from one command with no hidden state.
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 def _int_env(name: str, default: int) -> int:
@@ -44,7 +44,7 @@ class Config:
     data_dir: str = os.environ.get("KILDESPIR_DATA_DIR", "data")
 
     @classmethod
-    def from_env(cls) -> "Config":
+    def from_env(cls) -> Config:
         return cls()
 
 

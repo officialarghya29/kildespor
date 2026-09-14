@@ -1,8 +1,6 @@
 """Tests for the strict website identity gates (pass/fail core)."""
 from __future__ import annotations
 
-import pytest
-
 from kildespor.identity import (
     RobotRules,
     _contains_orgnr,

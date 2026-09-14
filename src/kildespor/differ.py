@@ -6,7 +6,7 @@ change records, never touching fields whose value is unchanged.
 """
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from .models import CompanyProfile, Fact
 
@@ -31,7 +31,7 @@ def _norm_value(value: Any) -> Any:
 
 
 def diff_profile(
-    previous: Optional[CompanyProfile], current: CompanyProfile
+    previous: CompanyProfile | None, current: CompanyProfile
 ) -> list[dict[str, Any]]:
     """Produce typed change records for one company.
 

@@ -23,10 +23,10 @@ from __future__ import annotations
 import csv
 import io
 import logging
-from typing import Any, Optional
+from typing import Any, ClassVar
 
 from ..http_client import PoliteClient
-from ..models import CompanyProfile, Fact, Source, utc_today
+from ..models import Fact, Source, utc_today
 
 log = logging.getLogger("kildespor.brreg")
 
@@ -69,7 +69,7 @@ class BrregConnector:
     # ------------------------------------------------------------------
     # Entity lookup
     # ------------------------------------------------------------------
-    def fetch_entity(self, orgnr: str) -> Optional[dict[str, Any]]:
+    def fetch_entity(self, orgnr: str) -> dict[str, Any] | None:
         url = f"{self.base}/enhetsregisteret/api/enheter/{orgnr}"
         resp = self.client.get(url)
         if resp is None or resp.status != 200:
@@ -83,7 +83,7 @@ class BrregConnector:
     # ------------------------------------------------------------------
     # Filed financial key figures (regnskapsregisteret)
     # ------------------------------------------------------------------
-    def fetch_regnskap(self, orgnr: str) -> Optional[list[dict[str, Any]]]:
+    def fetch_regnskap(self, orgnr: str) -> list[dict[str, Any]] | None:
         url = f"{self.base}/regnskapsregisteret/regnskap/{orgnr}"
         resp = self.client.get(url)
         if resp is None or resp.status != 200:
@@ -94,7 +94,7 @@ class BrregConnector:
             return None
         return data if isinstance(data, list) else None
 
-    def pick_regnskap(self, records: list[dict[str, Any]], orgnr: str) -> Optional[dict[str, Any]]:
+    def pick_regnskap(self, records: list[dict[str, Any]], orgnr: str) -> dict[str, Any] | None:
         """Choose the newest record whose OWN orgnr matches exactly.
 
         This is the identity guard for financial facts: a record filed by a
@@ -143,7 +143,7 @@ class BrregConnector:
             )
         return facts
 
-    FINANCIAL_FIELDS: dict[str, str] = {
+    FINANCIAL_FIELDS: ClassVar[dict[str, str]] = {
         "fiscal_year_end": "regnskapsperiode.tilDato",
         "operating_revenue": "resultatregnskapResultat.driftsresultat.driftsinntekter.sumDriftsinntekter",
         "operating_result": "resultatregnskapResultat.driftsresultat.driftsresultat",
@@ -225,7 +225,7 @@ def orgnr_checksum_valid(orgnr: str) -> bool:
 # ---------------------------------------------------------------------------
 # Bulk universe (deterministic sampling)
 # ------------------------------------------------------------------
-def parse_bulk_csv(content: str, limit: Optional[int] = None) -> list[dict[str, str]]:
+def parse_bulk_csv(content: str, limit: int | None = None) -> list[dict[str, str]]:
     """Parse the enhetsregisteret bulk CSV into plain dicts."""
     reader = csv.DictReader(io.StringIO(content))
     rows = []

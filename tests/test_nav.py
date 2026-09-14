@@ -10,8 +10,6 @@ def test_token_extraction_from_prose():
         "Current public token for Nav Job Vacancy Feed:\n"
         "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4In0.abcdefghij1234567890ABCDEFGHIJ"
     )
-    fake = object.__new__(NavFeedConnector)
-    # exercise the parsing logic via the private method with a stub
     chunks = [c for c in text.split() if c.count(".") == 2 and len(c) > 50]
     assert chunks and chunks[0].startswith("eyJ")
 

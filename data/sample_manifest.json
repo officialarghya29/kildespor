@@ -1,0 +1,33 @@
+{
+  "source": "https://data.brreg.no/enhetsregisteret/api/enheter/lastned/csv",
+  "seed": "kildespor-v1",
+  "universe_size_total": 1174030,
+  "universe_size_after_filter": 540310,
+  "excluded_forms": [
+    "ENK",
+    "ESEK",
+    "FLI",
+    "KTRF",
+    "ORGL",
+    "PMSA",
+    "SAM",
+    "SAU",
+    "VOFO"
+  ],
+  "forms_in_universe": {
+    "ENK": 462695,
+    "AS": 432362,
+    "FLI": 128832,
+    "ESEK": 33289,
+    "UTLA": 28211,
+    "NUF": 25847,
+    "DA": 10433,
+    "BRL": 10243,
+    "KBO": 7621,
+    "SAM": 7287,
+    "ANS": 7229,
+    "SA": 6846
+  },
+  "sample_size": 1200,
+  "csv_sha256": "5604d3b41f38056d34e6bf82be54e017d990da34cbda5ee9112e6ecd020ec981"
+}

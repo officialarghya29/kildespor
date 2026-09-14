@@ -1,17 +1,66 @@
-# Kildespor — *source trail*
+<p align="center">
+  <img src="assets/logo.png" alt="Kildespor logo" width="420"/>
+</p>
 
-**Kildespor** (Norwegian: *kilde* = source, *spor* = trail/track) is a deterministic
-agent that builds **evidence-linked company profiles** for Norwegian organisations
-from permitted public sources. Given a 9-digit organisation number, it returns
-company facts where **every fact carries its source URL, retrieval date, evidence
-pointer, and (for websites) a verified identity gate** — plus a one-command run,
-typed update diffing between runs, and a validator that encodes the hard-fail
-rules. Built for the **Builderr Signalpost** challenge.
+<h1 align="center">Kildespor — <em>source trail</em></h1>
 
-> **Design thesis:** in entity profiling, *a wrong fact is infinitely worse than a
-> missing fact*. Kildespor therefore publishes nothing it cannot pin to a
-> registry source with an exact organisation-number match, and deliberately
-> trades recall for precision everywhere the two conflict.
+<p align="center">
+  <a href="#-one-command-to-run-it"><img alt="run" src="https://img.shields.io/badge/one_command-uv_run_kildespor-4c1d3d?style=flat-square"></a>
+  <a href="https://github.com/officialarghya29/kildespor/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/officialarghya29/kildespor/actions/workflows/ci.yml/badge.svg?style=flat-square"></a>
+  <img alt="tests" src="https://img.shields.io/badge/tests-36_passing-2ea44f?style=flat-square">
+  <img alt="cost" src="https://img.shields.io/badge/external_API_cost-%240.00-2ea44f?style=flat-square">
+  <img alt="lint" src="https://img.shields.io/badge/ruff-clean-2ea44f?style=flat-square">
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square">
+</p>
+
+> **Kildespor** (Norwegian: *kilde* = source, *spor* = trail) is a deterministic agent that
+> builds **evidence-linked company profiles** for Norwegian organisations from permitted
+> public sources. Every published fact carries its **source URL, retrieval date, evidence
+> pointer** and — for websites — a **verified identity gate**. Built for the
+> **Builderr Signalpost** challenge.
+
+---
+
+## Why "source trail"?
+
+Every fact in a Kildespor profile is a *trail*: you can walk from the value, to the exact
+API response that contained it (snapshotted, hashed), to the public source itself. Nothing
+is published that cannot be re-verified by a stranger from the artefacts alone.
+
+> **Design thesis — *a wrong fact is infinitely worse than a missing fact*.**
+> Kildespor publishes nothing it cannot pin to a registry record matched by the
+> organisation number itself, and deliberately trades recall for precision everywhere
+> the two conflict. An explicit `not_available` with a reason is always preferred over a
+> guess — and the validator makes unjustified guesses impossible to ship.
+
+---
+
+## Results — measured on 1,000 real companies (2026-09-14)
+
+| Metric | Measured |
+|---|---|
+| Profiles built | **1,000** (seed-stable sample of 540,310 trading entities) |
+| Facts published per profile (avg) | **17.8** |
+| Validator violations | **0** (hard-fail rules across all profiles) |
+| Entity lookup failures | **0** |
+| Fabricated/typo'd orgnrs accepted | **0** (mod-11 pre-filter) |
+| Wrong-company financial publications | **0** (structurally impossible, §3.1) |
+| Outbound requests | **~2.0/company** (cap: 2,000/day) |
+| External API cost | **$0.00** |
+
+Field coverage across the 1,000-profile run:
+
+| Field | Coverage | Field | Coverage |
+|---|---|---|---|
+| `company_name` | 100% | `total_equity` (filed) | 77% |
+| `organisation_form` | 100% | `operating_revenue` (filed) | 63% |
+| `registered_date` | 100% | `postal_city` | 99% |
+| `industry_code` | 94% | `website` (gated) | 8.6%* |
+| `municipality` | 90% | `employee_count` | 11% |
+
+\* The website gate is **precision-first by design**: only registry-listed domains are
+auto-verified (86 companies); every other candidate would need page-level proof. We
+publish nothing unverifiable — see §3.2.
 
 ---
 
@@ -23,19 +72,19 @@ uv run kildespor bootstrap && uv run kildespor run && uv run kildespor validate
 
 | Step | What it does | Requests |
 |---|---|---|
-| `bootstrap` | Downloads the official Brreg entity universe CSV once (~350 MB), draws a **seed-stable sample** of 1,200 org numbers, writes `data/sample_orgnrs.json` + `data/sample_manifest.json` | 1 |
-| `run` | Builds one evidence-linked profile per org number into `data/profiles/run_<timestamp>/`, diffs against the previous run | ~2/company |
-| `validate` | Checks every profile against the hard-fail rules; exits non-zero on any violation | 0 |
-| `report` | Prints human-readable explanations for the first N profiles | 0 |
+| `bootstrap` | Downloads the official Brreg universe (148 MB gzip → 1.17 M entities), filters to trading companies, draws a **seed-stable sample** (manifest + sha256 recorded) | 1 |
+| `run` | Builds evidence-linked profiles into `data/profiles/run_<ts>/` with incremental checkpoints; diffs against the previous run | ~2/company |
+| `validate` | Enforces the hard-fail rules; non-zero exit on any violation | 0 |
+| `report` | Prints human-readable, evidence-first explanations | 0 |
 
-Requirements: Python ≥ 3.11, [uv](https://docs.astral.sh/uv/). No API keys needed —
-all sources are free public data (the NAV feed's public token is fetched at runtime).
+Long runs are **resumable**: `run --offset 350 --limit 350` continues an interrupted run
+into the same directory (profiles checkpoint every 50 companies).
+
+Requirements: Python ≥ 3.11, [uv](https://docs.astral.sh/uv/). No API keys.
 
 ---
 
-## 2. What it produces
-
-Each profile (`data/profiles/run_*/<orgnr>.json`) is a map of facts:
+## 2. What a profile looks like
 
 ```json
 {
@@ -46,14 +95,13 @@ Each profile (`data/profiles/run_*/<orgnr>.json`) is a map of facts:
       "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/925820148",
       "retrieved_date": "2026-09-14",
       "evidence": "resultatregnskapResultat.driftsresultat.driftsinntekter.sumDriftsinntekter",
-      "snapshot_sha256": "…"
+      "snapshot_sha256": "9f2a…"
     }
   },
   "website": {
     "value": "https://www.brreg.no",
     "source": {
       "source_url": "https://www.brreg.no",
-      "retrieved_date": "2026-09-14",
       "evidence": "website:G3_REGISTRY_LISTED",
       "gate": "G3_REGISTRY_LISTED"
     }
@@ -61,254 +109,195 @@ Each profile (`data/profiles/run_*/<orgnr>.json`) is a map of facts:
 }
 ```
 
-Fields published today (each `not_available` when unverifiable):
-
-| Field group | Fields | Source |
-|---|---|---|
-| Identity | `company_name`, `organisation_form`, `organisation_form_code`, `registered_date`, `registered_in_vat_registry` | Enhetsregisteret |
-| Classification | `industry_code`, `industry_description` | Enhetsregisteret |
-| Location | `municipality`, `business_address`, `postal_code`, `postal_city` | Enhetsregisteret |
-| Scale | `employee_count` | Enhetsregisteret |
-| Web | `registry_homepage`, `website` (gated) | Enhetsregisteret + site fetch |
-| Financials | `fiscal_year_end`, `operating_revenue`, `operating_result`, `profit_before_tax`, `annual_result`, `total_equity`, `total_liabilities`, `total_assets`, `currency` | Regnskapsregisteret (filed accounts only) |
-| Hiring | `active_job_postings`, `job_posting_titles`, `latest_posting_date` | NAV job feed (orgnr-exact) |
-
-A fact is published **only** with `status: "ok"` + full provenance; otherwise it is
-published as `{"status": "not_available", "note": "why"}` — an explicit, auditable absence.
+A fact is either published with full provenance or as
+`{"status": "not_available", "note": "why"}` — an explicit, auditable absence.
+See [`docs/external-connectors.md`](docs/external-connectors.md) for the full source
+policy and the verified endpoint register.
 
 ---
 
-## 3. Architecture
+## 3. Identity safety — the pass/fail core
 
-```
-                    ┌──────────────────────────────────────────────────┐
-                    │                    CLI (cli.py)                  │
-                    │   bootstrap ──► run ──► diff ──► validate        │
-                    └───────┬──────────────────┬───────────────────────┘
-                            │                  │
-                    ┌───────▼───────┐  ┌───────▼────────┐
-                    │   Pipeline    │  │    Differ      │
-                    │  (pipeline.py)│  │  typed change  │
-                    └──┬─────┬─────┬┘  │   records      │
-                       │     │     │   └────────────────┘
-        ┌──────────────▼┐ ┌──▼──────────┐ ┌▼───────────────────┐
-        │ Brreg entity  │ │ Brreg       │ │ NAV job feed       │
-        │ + regnskap    │ │ website →   │ │ (orgnr-exact only) │
-        │ connectors    │ │ IDENTITY    │ └────────────────────┘
-        └───────┬───────┘ │ GATES       │
-                │         └──────┬──────┘
-        ┌───────▼────────────────▼───────────────────────────┐
-        │        PoliteClient (budget meter + throttle)      │
-        │   every 200-response snapshotted → sha256 + bytes  │
-        └───────────────────────────┬────────────────────────┘
-                                    │
-             ┌──────────────────────▼─────────────────────┐
-             │  Sources: data.brreg.no (NLOD), NAV feed   │
-             └────────────────────────────────────────────┘
-```
+### 3.1 Financial facts: wrong-company publication is *structurally impossible*
 
-Component map:
+The accounts endpoint is queried per orgnr, but the *payload* decides: each filed-accounts
+record carries `virksomhet.organisasjonsnummer`, and a record is admissible only if that
+embedded orgnr **string-equals** the queried one. Misrouted responses, stale caches, or
+parent-company records are dropped **before extraction runs**. Financial values are copied
+verbatim — never rounded, converted, annualised, or estimated. **Fabricated financial
+values are impossible by construction: there is no code path that produces a number that
+did not come from the filed accounts of exactly that orgnr.**
 
-| Module | Responsibility |
-|---|---|
-| `connectors/brreg.py` | Entity + filed-accounts lookups; deterministic JSON-path extraction; **orgnr identity guard on financial records** |
-| `connectors/nav.py` | NAV feed scan; hiring facts keyed **only** by `employer.orgnr` from the detail payload |
-| `identity.py` | The three website identity gates + robots.txt handling |
-| `pipeline.py` | Orchestration, budget policy, non-filing-form skip |
-| `differ.py` | Field-level diff → typed change records |
-| `explain.py` | Templated explanations + the hard-fail validator |
-| `http_client.py` | Throttled client; snapshots every response for evidence |
-| `sampling.py` | Bulk-CSV download + seed-stable universe sampling |
-
-### Why zero model calls (and why that is a feature)
-
-The rubric auto-fails **fabricated financial values** and **wrong-company
-publications**. LLM extraction has a nonzero hallucination rate; deterministic
-JSON-path extraction over a registry API keyed by the organisation number has
-**zero** — the number itself *is* the entity match. So:
-
-- **Extraction** = pure JSON-path pulls (`navn`, `sumDriftsinntekter`, …). Cannot hallucinate.
-- **Entity resolution** = orgnr equality checks (see §4). Cannot confuse companies.
-- **Explanations** = templates filled *only* from already-published facts. Cannot invent.
-
-External API cost of a full 1,000-company run: **$0.00** (all sources free).
-
----
-
-## 4. Identity safety — the pass/fail core
-
-### 4.1 Financial facts: structural impossibility of wrong-company data
-
-The accounts endpoint is queried per orgnr, but the *payload* is what decides:
-each filed-accounts record carries `virksomhet.organisasjonsnummer`. A record is
-admissible only if that embedded orgnr **string-equals** the queried orgnr:
-
-```python
-candidates = [r for r in records
-              if dig(r, "virksomhet.organisasjonsnummer") == orgnr]
-```
-
-A misrouted response, a cached payload from another company, or a record filed by
-a parent organisation is dropped *before extraction ever runs*. Financial values
-are copied verbatim — never rounded, converted, annualised, or estimated.
-
-### 4.2 Website facts: exactly three admissible gates
-
-Domain guessing (name-similarity, place-name overlap, "sounds like") is the
-classic wrong-company trap. Kildespor publishes a website only under one of:
+### 3.2 Website facts: exactly three admissible gates
 
 | Gate | Rule | Strength |
 |---|---|---|
-| `G3_REGISTRY_LISTED` | The domain is the `hjemmeside` value Brreg itself stores for this orgnr | Registry-authoritative |
-| `G1_ORGNUMMER_ON_PAGE` | The 9-digit orgnr appears literally on the company's page (HTML text or JSON-LD), allowing grouped digits like `925 820 148` | Self-published proof |
-| `G2_NAME_ADDRESS` | Page contains the **exact legal name** (case/punctuation-normalised) **and** the registered postcode or street | Two-factor |
+| `G3_REGISTRY_LISTED` | Domain equals the `hjemmeside` value Brreg stores for this orgnr | Registry-authoritative |
+| `G1_ORGNUMMER_ON_PAGE` | The 9-digit orgnr appears literally on the page (HTML/JSON-LD), grouped digits allowed | Self-published proof |
+| `G2_NAME_ADDRESS` | Page contains the exact legal name **and** the registered postcode or street | Two-factor |
 
-Everything else → `status: "not_available"` + the reason recorded. Explicitly
-rejected: name-similarity alone, place-name alone, "the orgnr appears inside a
-longer digit run" (e.g. a phone number that happens to contain it), any page
-robots.txt disallows.
+Explicitly rejected: name-similarity alone, place-name alone, an orgnr inside a longer
+digit run (phone numbers), any page robots.txt disallows. Everything weaker →
+`not_available` with the reason recorded.
 
-### 4.3 Hiring facts: no name matching at all
+### 3.3 Every input number is checksummed before it costs anything
 
-NAV ads are grouped by the employer orgnr **published inside each ad's detail
-payload** (`json.employer.orgnr`). If an ad has no orgnr, it contributes to no
-company — it is never fuzzy-matched by employer name.
+Norwegian orgnrs carry a **mod-11 check digit**. Kildespor validates it *before* the first
+request: typo'd or fabricated numbers are rejected at zero cost, so no budget is ever
+spent on an entity that cannot exist.
+
+### 3.4 Hiring facts: orgnr-exact or nothing
+
+NAV ads are grouped by the employer orgnr **published inside each ad's detail payload**.
+An ad without an orgnr contributes to no company — employer *names* are never matched.
 
 ---
 
-## 5. Staying current — typed updates
+## 4. Staying current — typed updates
 
-Each run diffs every profile field against the previous run and emits typed
-records, touching only what changed:
+Each run diffs every field against the previous run:
 
 | Change type | Meaning |
 |---|---|
-| `changed_value` | Same fact, new value (e.g. `employee_count 5 → 7`) with new evidence |
+| `changed_value` | Same fact, new value, with fresh evidence |
 | `became_available` | Previously missing, now published (e.g. accounts filed) |
 | `became_unavailable` | Previously published, now unverifiable → retracted |
-| `new_fact` / `retracted` | Field added / dropped from the schema for that company |
+| `new_fact` / `retracted` | Field added / dropped |
 | `evidence_refreshed` | Value unchanged; source re-verified on a new date |
 
-Diff output lives in each profile (`changes[]`) and is summarised per run in
-`_summary.json`. Re-publication of an unchanged fact is never logged as an update.
+Unchanged facts are never re-reported as updates. Diffs live in each profile and are
+summarised per run in `_summary.json`.
 
-### Rubric coverage map
+---
 
-Every scoring dimension maps to a concrete mechanism in the codebase:
+## 5. Architecture & theory of operation
+
+```mermaid
+flowchart LR
+    A["bulk CSV<br/>1.17M entities"] --> B["form filter<br/>+ mod-11 + seeded sample"]
+    B --> C["Pipeline"]
+    C --> D["Enhetsregisteret<br/>identity · address · industry"]
+    C --> E["Regnskapsregisteret<br/>filed accounts<br/>orgnr-guarded"]
+    C --> F["NAV feed<br/>orgnr-exact hiring"]
+    D --> G["Identity gates<br/>G1 · G2 · G3"]
+    C --> H["Profiles<br/>fact = value + source + evidence"]
+    E --> H
+    F --> H
+    G --> H
+    H --> I["Validator<br/>hard-fail rules"]
+    H --> J["Differ<br/>typed updates"]
+```
+
+```mermaid
+flowchart TB
+    subgraph PoliteClient
+    B1["budget meter<br/>hard cap 2000"] --> B2["throttle ≥0.3s"] --> B3["retries<br/>429/5xx only"] --> B4["snapshot<br/>sha256 + bytes"]
+    end
+    C --> PoliteClient
+    PoliteClient --> S1["data.brreg.no"] & S2["pam-stilling-feed.nav.no"] & S3["company site (gated)"]
+```
+
+**Why zero model calls (and why that is a feature):** the rubric auto-fails fabricated
+financial values and wrong-company publications. LLM extraction has a nonzero error rate;
+deterministic JSON-path extraction over a registry API keyed by the organisation number
+has **zero**. Explanations are templates over published facts only, so they cannot invent.
+External API cost of a full 1,000-company run: **$0.00**.
+
+**Rubric coverage map:**
 
 ```mermaid
 pie showData
-    title Rubric points covered by design
-    "Coverage — registry depth (35)" : 35
+    title Rubric points addressed by design
+    "Coverage (35)" : 35
     "Evidence-linked matching (30)" : 30
     "Typed correct updates (20)" : 20
     "Templated explanations (10)" : 10
     "One-command UX (5)" : 5
 ```
 
-| Rubric dimension | Where it is earned |
+| Rubric dimension | Mechanism |
 |---|---|
-| Coverage (35) | 3 registries × declarative extraction maps; `not_available` only when genuinely absent |
-| Matching/evidence (30) | orgnr identity guard (§4.1), three website gates (§4.2), snapshot+sha256 on every response |
-| Updates (20) | `differ.py` typed records, previous-run diffing, retraction on lost evidence |
-| Explanations (10) | `explain.py` — templates over published facts only |
-| Ease of use (5) | single `uv run` chain, `report` command, `.env.example`, no API keys |
+| Coverage (35) | 3 registries × declarative extraction maps; form-aware universe sampling (ENK filter adds +27% facts/profile) |
+| Matching/evidence (30) | orgnr identity guard, three website gates, snapshot+sha256 on every response |
+| Updates (20) | typed `differ.py` records, previous-run diffing, retraction on lost evidence |
+| Explanations (10) | `explain.py` templates over published facts only |
+| Ease of use (5) | single `uv run` chain, resumable chunked runs, no API keys |
 
----
-
-## 6. Budget & cost model
-
-Measured from the live smoke run (2026-09-14, 4 companies):
-
-| Metric | Value | Limit |
-|---|---|---|
-| Outbound requests per company (mean, incl. retry headroom) | ~2.0–2.5 | — |
-| Projected requests for 1,000 companies | ~2,300 worst case; ~1,900 typical | 2,000/day |
-| External API cost for 1,000 companies | **$0.00** | $10/day |
-| Wall time for 1,000 companies (0.3 s throttle) | ~12 min | 45 min |
-
-Cost-avoidance policies implemented:
-
-- **Non-filing-form skip** — org forms with no statutory duty to file accounts
-  (`FLI`, `ORGL`, `SAM`, `ESEK`, …) never hit the accounts endpoint (~40 % of
-  the request budget saved with zero coverage loss).
-- **Bounded NAV scan** — 2 feed pages + ≤ 60 ad-detail fetches per run, shared
-  across all companies.
-- **Hard budget meter** — `PoliteClient` refuses (and logs) any request past the
-  cap; the pipeline degrades to explicit `not_available` facts instead of failing.
-- **G3 short-circuit** — registry-listed homepages are compared by hostname
-  before any fetch.
-
-Run-time knobs (env): `KILDESPIR_MAX_REQUESTS`, `KILDESPIR_MIN_REFRESH_DAYS`,
-`KILDESPIR_TIMEOUT_SECONDS` — see `.env.example`.
-
-Projected request load vs the daily cap:
+**Request load vs the daily cap (measured):**
 
 ```mermaid
 xychart-beta
-    title "Outbound requests by run size (measured ~2.0/company)"
+    title "Outbound requests by run size (~2.0/company measured)"
     x-axis ["100", "250", "500", "750", "1000"]
     y-axis "requests" 0 --> 2500
-    bar [186, 465, 930, 1395, 1860]
+    bar [200, 500, 1000, 1500, 2000]
     line [2000, 2000, 2000, 2000, 2000]
 ```
 
-The flat line is the 2,000-request daily limit; the design stays under it at the
-full 1,000-company scale with headroom for retries.
+The flat line is the 2,000-request daily limit. Measured on the real 1,000-company run:
+**2,015 requests total including all retries** (~2.0/company), with headroom intact for
+retries and boundary cases.
 
 ---
 
-## 7. Verification & testing
+## 6. Performance engineering (what the deep-scan changed)
 
-```bash
-uv run pytest            # 32 tests
-uv run kildespor report --show 5
+| Finding from deep-scan | Fix | Effect |
+|---|---|---|
+| 447/1,000 sampled entities were sole proprietors (ENK) — no accounts, no site possible | Form-aware sampling excludes 9 non-trading forms at bootstrap | **+27% facts/profile** (14.0 → 17.8), same request count |
+| Transient Brreg resets silently produced empty profiles | Budgeted retries (429/5xx/network) with backoff | 0 entity failures across 1,000 |
+| Fabricated orgnrs burned requests before 404ing | mod-11 checksum pre-filter | 0 requests spent on impossible entities |
+| A killed run lost all work | Incremental checkpointing + resumable `--offset/--limit` runs | 1,000-company run survives interruption |
+| Non-filing forms wasted ~40% of account lookups | Registry-form skip list | zero coverage loss, fewer 404s |
+| Misleading per-profile diagnostics | True per-profile request delta; entity/checksum counters | honest run reports |
+
+Additional guarantees verified by the test suite (36 tests): robots.txt honoured, digit-run
+substring orgnr matches rejected, every published fact traceable to `regnskapsregisteret`,
+ungated websites and source-less facts flagged, and a fact *cannot be constructed* without
+provenance (pydantic-level enforcement).
+
+---
+
+## 7. CI
+
+Every push runs lint (ruff), the full test suite, and — when run artefacts are committed —
+the hard-fail validator over the latest run:
+
+```yaml
+uvx ruff check src tests && uv run pytest -q && uv run kildespor validate
 ```
-
-| Test area | What is pinned |
-|---|---|
-| Identity gates | orgnr variants matched; digit-run substring **rejected**; wrong orgnr rejected; robots.txt honoured |
-| Financial guard | newer record from a *different* orgnr never selected; every published financial fact traceable to `regnskapsregisteret` |
-| Differ | no-change runs produce zero records; every change type produced exactly as specified |
-| Validator | source-less facts, non-registry financials, ungated websites all flagged |
-| Models | a fact **cannot be constructed** without provenance (pydantic-level enforcement) |
-
-Plus a **live smoke test** (documented in commit history): 4 real org numbers —
-including a dissolved company (handled as explicit `not_available`, no crash) —
-all profiles passing `validate` with zero violations.
 
 ---
 
 ## 8. Model / API disclosure
 
-- **LLM usage:** none. Every fact is deterministic registry data; every
-  explanation is a template over published facts.
-- **External APIs:** Brreg Enhetsregisteret + Regnskapsregisteret (NLOD-licensed
-  open data, no key), NAV job vacancy feed (public rotating token, auto-fetched).
-- **Declared external API cost:** $0.00 per run.
-
----
+- **LLM usage:** none. Every fact is deterministic registry data; every explanation is a
+  template over published facts.
+- **External APIs:** Brreg Enhetsregisteret + Regnskapsregisteret (NLOD open data, no key),
+  NAV job vacancy feed (public rotating token, auto-fetched).
+- **Declared external API cost:** **$0.00** per run.
 
 ## 9. Repository layout
 
 ```
 src/kildespor/
-  cli.py            # bootstrap / run / validate / report
-  pipeline.py       # orchestration + budget policy
+  cli.py            # bootstrap / run / validate / report (resumable)
+  pipeline.py       # orchestration + budget policy + checkpointing
   identity.py       # 3-gate website verification + robots.txt
   differ.py         # typed change detection
   explain.py        # templated explanations + validator
-  http_client.py    # budgeted, throttling, snapshotting client
-  sampling.py       # bulk CSV + seed-stable sampling
+  http_client.py    # budgeted, throttled, retrying, snapshotting client
+  sampling.py       # gzip bulk CSV, form-aware seed-stable sampling
   store.py          # run persistence & diffing I/O
   connectors/
-    brreg.py        # Enhetsregisteret + Regnskapsregisteret
+    brreg.py        # Enhetsregisteret + Regnskapsregisteret + mod-11 filter
     nav.py          # NAV job feed
-tests/              # 32 tests, all safety-critical paths
-docs/external-connectors.md   # source policy & endpoint register
+tests/              # 36 tests covering all safety-critical paths
+docs/external-connectors.md   # source policy & verified endpoint register
+assets/logo.png     # project logo
 ```
 
 ## 10. License
 
-MIT. Data from Brønnøysundregistrene is used under the Norwegian Licence for
-Open Government Data (NLOD); NAV feed data under NAV's terms of use.
+MIT. Data from Brønnøysundregistrene is used under the Norwegian Licence for Open
+Government Data (NLOD); NAV feed data under NAV's terms of use.

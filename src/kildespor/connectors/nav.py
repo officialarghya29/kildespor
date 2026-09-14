@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from ..http_client import PoliteClient
 from ..models import Fact, Source, utc_today
@@ -27,11 +27,11 @@ class NavFeedConnector:
     def __init__(self, client: PoliteClient, base: str):
         self.client = client
         self.base = base.rstrip("/")
-        self._token: Optional[str] = None
+        self._token: str | None = None
         self._token_ts: float = 0.0
 
     # ------------------------------------------------------------------
-    def _get_token(self) -> Optional[str]:
+    def _get_token(self) -> str | None:
         if self._token and (time.monotonic() - self._token_ts) < TOKEN_TTL_SECONDS:
             return self._token
         resp = self.client.get(f"{self.base}/api/publicToken", snap=False)
@@ -48,7 +48,7 @@ class NavFeedConnector:
         log.warning("NAV public token not recognised in response")
         return None
 
-    def _authed_get(self, url: str, params: Optional[dict] = None) -> Optional[Any]:
+    def _authed_get(self, url: str, params: dict | None = None) -> Any | None:
         token = self._get_token()
         if token is None:
             return None
@@ -77,7 +77,7 @@ class NavFeedConnector:
         """
         by_orgnr: dict[str, list[dict]] = {}
         active_ads: list[dict] = []
-        url: Optional[str] = f"{self.base}/api/v1/feed"
+        url: str | None = f"{self.base}/api/v1/feed"
         pages = 0
         while url and pages < max_pages:
             data = self._authed_get(url)
@@ -133,7 +133,7 @@ class NavFeedConnector:
         return by_orgnr
 
     def _abs(self, url: str) -> str:
-        if url.startswith("http://") or url.startswith("https://"):
+        if url.startswith(("http://", "https://")):
             return url
         return f"{self.base}{url}"
 

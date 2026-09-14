@@ -23,24 +23,21 @@ from __future__ import annotations
 import json
 import logging
 import re
-import time
 from dataclasses import dataclass
-from typing import Optional
 from urllib.parse import urlparse
-from xml.etree import ElementTree
 
 from .http_client import HttpResponse, PoliteClient
 from .models import Gate
 
 log = logging.getLogger("kildespor.identity")
 
-_ROBOT_CACHE: dict[str, Optional["RobotRules"]] = {}
+_ROBOT_CACHE: dict[str, RobotRules | None] = {}
 _UA_TOKEN = "kildespor"
 
 
 @dataclass
 class GateResult:
-    gate: Optional[Gate]
+    gate: Gate | None
     passed: bool
     reason: str
     checked_url: str
@@ -74,7 +71,7 @@ def fetch_robots(client: PoliteClient, base_url: str) -> RobotRules:
         disallow: list[str] = []
         try:
             text = resp.text
-        except Exception:
+        except Exception:  # noqa: BLE001 - any decode quirk just means empty rules
             text = ""
         for line in text.splitlines():
             line = line.split("#", 1)[0].strip()
@@ -110,7 +107,7 @@ def _jsonld_texts(html: str) -> str:
     for match in re.finditer(
         r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
         html,
-        re.S | re.I,
+        re.DOTALL | re.IGNORECASE,
     ):
         raw = match.group(1)
         try:
@@ -145,9 +142,9 @@ def evaluate_website(
     candidate_url: str,
     orgnr: str,
     legal_name: str,
-    postal_code: Optional[str],
-    street_address: Optional[str],
-    registry_homepage: Optional[str],
+    postal_code: str | None,
+    street_address: str | None,
+    registry_homepage: str | None,
     client: PoliteClient,
 ) -> GateResult:
     """Decide whether candidate_url may be published as this company's website."""
@@ -174,7 +171,7 @@ def evaluate_website(
             reason="robots.txt disallows fetching this path",
             checked_url=candidate_url,
         )
-    resp: Optional[HttpResponse] = client.get(candidate_url, snap=True)
+    resp: HttpResponse | None = client.get(candidate_url, snap=True)
     if resp is None or resp.status != 200:
         return GateResult(
             gate=None, passed=False,
@@ -218,10 +215,8 @@ def evaluate_website(
 
 def _same_site(a: str, b: str) -> bool:
     ha, hb = urlparse(a).netloc.lower(), urlparse(b).netloc.lower()
-    if ha.startswith("www."):
-        ha = ha[4:]
-    if hb.startswith("www."):
-        hb = hb[4:]
+    ha = ha.removeprefix("www.")
+    hb = hb.removeprefix("www.")
     return ha == hb
 
 

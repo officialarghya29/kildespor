@@ -13,7 +13,7 @@ import logging
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .config import CONFIG
@@ -21,7 +21,7 @@ from .differ import diff_profile, summarise_changes
 from .explain import explain_profile, validate_profile
 from .http_client import PoliteClient
 from .pipeline import Pipeline
-from .sampling import download_bulk_csv, sample_orgnrs
+from .sampling import LOW_VALUE_FORMS, download_bulk_csv, sample_orgnrs
 from .store import latest_run_dir, load_profiles, save_profiles
 
 log = logging.getLogger("kildespor.cli")
@@ -36,7 +36,7 @@ def _setup_logging(verbose: bool) -> None:
 
 
 def _new_run_dir() -> str:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return str(Path(CONFIG.data_dir) / "profiles" / f"run_{stamp}")
 
 
@@ -48,17 +48,19 @@ def cmd_bootstrap(args: argparse.Namespace) -> int:
     if os.path.exists(csv_path) and not args.force:
         log.info("bulk CSV already present: %s (use --force to re-download)", csv_path)
     else:
-        log.info("downloading Brreg bulk CSV (one request, ~200-400 MB) ...")
+        log.info("downloading Brreg bulk CSV (one request, ~150 MB gz) ...")
         download_bulk_csv(csv_path)
-    orgnrs, manifest = sample_orgnrs(csv_path, args.n, seed=args.seed)
+    orgnrs, manifest = sample_orgnrs(
+        csv_path, args.n, seed=args.seed, exclude_forms=LOW_VALUE_FORMS
+    )
     manifest_path = Path(CONFIG.data_dir) / "sample_manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     sample_path = Path(CONFIG.data_dir) / "sample_orgnrs.json"
     sample_path.write_text(json.dumps(orgnrs, indent=1), encoding="utf-8")
     log.info(
-        "sampled %d orgnrs of %d (seed=%s) -> %s",
-        manifest["sample_size"], manifest["universe_size"], args.seed, sample_path,
+        "sampled %d orgnrs of %d after form filter (seed=%s) -> %s",
+        manifest["sample_size"], manifest["universe_size_after_filter"], args.seed, sample_path,
     )
     return 0
 
@@ -80,9 +82,20 @@ def cmd_run(args: argparse.Namespace) -> int:
     run_dir = args.run_dir or _new_run_dir()
     prev_dir = args.since_run or latest_run_dir(str(Path(CONFIG.data_dir) / "profiles"), exclude=run_dir)
 
+    # Chunking: process a slice of the sample (spread a full refresh across
+    # several invocations/budget windows); profiles accumulate in the run dir.
+    offset = max(0, args.offset)
+    if args.limit:
+        orgnrs = orgnrs[offset:offset + args.limit]
+    elif offset:
+        orgnrs = orgnrs[offset:]
+    if offset or args.limit:
+        log.info("sample slice: offset=%d limit=%s -> %d companies", offset, args.limit or "all", len(orgnrs))
+
     started = time.monotonic()
+    Path(run_dir).mkdir(parents=True, exist_ok=True)
     pipeline = Pipeline(client=PoliteClient(snapshot_dir=str(Path(CONFIG.data_dir) / "snapshots")))
-    profiles = pipeline.run(orgnrs)
+    profiles = pipeline.run(orgnrs, run_dir=run_dir, save_every=50)
     elapsed = time.monotonic() - started
 
     # --- Diff against previous run (typed updates)
@@ -108,7 +121,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         "elapsed_seconds": round(elapsed, 1),
         "changes_total": len(total_changes),
         "changes_by_type": summarise_changes(total_changes),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
     }
     (Path(out) / "_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
@@ -140,17 +153,12 @@ def cmd_report(args: argparse.Namespace) -> int:
         log.error("no run directory found")
         return 2
     profiles = load_profiles(run_dir)
-    sample_n = min(args.show, len(profiles))
-    shown = 0
-    for orgnr in sorted(profiles):
-        if shown >= sample_n:
-            break
+    for shown, orgnr in enumerate(sorted(profiles)[: args.show]):
         p = profiles[orgnr]
         print("=" * 72)
         print(f"ORG {orgnr}")
         for line in explain_profile(p):
             print(f"  - {line}")
-        shown += 1
     summary_path = Path(run_dir) / "_summary.json"
     if summary_path.exists():
         print("=" * 72)
@@ -178,6 +186,8 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--n", type=int, default=0, help="sample size (0 = use saved sample file)")
     p_run.add_argument("--seed", default="kildespor-v1")
     p_run.add_argument("--run-dir", default=None)
+    p_run.add_argument("--offset", type=int, default=0, help="start at this index in the sample")
+    p_run.add_argument("--limit", type=int, default=0, help="process at most N companies (0 = all)")
     p_run.add_argument("--since-run", default=None, help="previous run dir to diff against")
     p_run.set_defaults(func=cmd_run)
 

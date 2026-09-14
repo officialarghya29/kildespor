@@ -1,0 +1,17 @@
+{
+  "run_dir": "data/profiles/run_20260914T114639Z",
+  "previous_run_dir": "data/profiles/run_20260914T113236Z",
+  "profiles": 350,
+  "facts_published": 6469,
+  "facts_unavailable": 1515,
+  "website_gate_pass": 41,
+  "website_gate_ambiguous": 309,
+  "entity_failures": 0,
+  "checksum_rejected": 0,
+  "requests_used": 705,
+  "request_budget": 2000,
+  "elapsed_seconds": 389.2,
+  "changes_total": 0,
+  "changes_by_type": {},
+  "generated_at": "2026-09-14T11:53:09.223902+00:00"
+}

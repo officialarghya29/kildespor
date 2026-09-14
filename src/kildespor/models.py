@@ -10,8 +10,8 @@ metadata.  Every published value must carry:
 from __future__ import annotations
 
 import hashlib
-from datetime import date, datetime, timezone
-from typing import Any, Literal, Optional
+from datetime import UTC, date, datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -30,12 +30,12 @@ class Source(BaseModel):
     # e.g. "resultatregnskapResultat.aarsresultat"
     evidence: str
     # sha256 of the raw response bytes at retrieval time
-    snapshot_sha256: Optional[str] = None
+    snapshot_sha256: str | None = None
     # Identity gate (website facts only)
-    gate: Optional[Gate] = None
+    gate: Gate | None = None
 
     @model_validator(mode="after")
-    def _website_requires_gate(self) -> "Source":
+    def _website_requires_gate(self) -> Source:
         if self.evidence.startswith("website") and self.gate is None:
             raise ValueError("website facts must carry an identity gate")
         return self
@@ -45,19 +45,19 @@ class Fact(BaseModel):
     """One field on a company profile, always with its provenance."""
 
     field: str
-    value: Optional[FactValue] = None
+    value: FactValue | None = None
     status: Literal["ok", "not_available"] = "ok"
-    source: Optional[Source] = None
-    note: Optional[str] = None
+    source: Source | None = None
+    note: str | None = None
 
     @model_validator(mode="after")
-    def _status_consistency(self) -> "Fact":
+    def _status_consistency(self) -> Fact:
         if self.status == "ok" and self.source is None:
             raise ValueError(f"fact {self.field!r}: published facts need a source")
         return self
 
     @classmethod
-    def unavailable(cls, field: str, note: str) -> "Fact":
+    def unavailable(cls, field: str, note: str) -> Fact:
         return cls(field=field, status="not_available", note=note)
 
 
@@ -66,7 +66,7 @@ class CompanyProfile(BaseModel):
 
     organisasjonsnummer: str
     generated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     facts: dict[str, Fact] = Field(default_factory=dict)
     # Facts from the previous run that differ now (filled by the differ)
@@ -77,7 +77,7 @@ class CompanyProfile(BaseModel):
     def add(self, fact: Fact) -> None:
         self.facts[fact.field] = fact
 
-    def get(self, field: str) -> Optional[Fact]:
+    def get(self, field: str) -> Fact | None:
         return self.facts.get(field)
 
     @property
@@ -90,4 +90,4 @@ def new_snapshot_id(raw: bytes) -> str:
 
 
 def utc_today() -> date:
-    return datetime.now(timezone.utc).date()
+    return datetime.now(UTC).date()

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from .config import CONFIG
 from .connectors.brreg import BrregConnector, orgnr_checksum_valid
@@ -42,11 +42,11 @@ NON_FILING_FORMS = {
 
 
 class Pipeline:
-    def __init__(self, client: Optional[PoliteClient] = None):
+    def __init__(self, client: PoliteClient | None = None):
         self.client = client or PoliteClient()
         self.brreg = BrregConnector(self.client)
         self.nav = NavFeedConnector(self.client, CONFIG.nav_feed_base)
-        self._jobs_cache: Optional[dict[str, list[dict]]] = None
+        self._jobs_cache: dict[str, list[dict]] | None = None
         self.stats = {
             "profiles": 0,
             "facts_published": 0,
@@ -59,7 +59,17 @@ class Pipeline:
         }
 
     # ------------------------------------------------------------------
-    def run(self, orgnrs: list[str]) -> list[CompanyProfile]:
+    def run(
+        self,
+        orgnrs: list[str],
+        *,
+        run_dir: str | None = None,
+        save_every: int = 50,
+    ) -> list[CompanyProfile]:
+        """Build profiles; when ``run_dir`` is given, persist incrementally so
+        long runs survive interruption (resumable by re-running with --offset)."""
+        from .store import save_profiles
+
         profiles: list[CompanyProfile] = []
         started = time.monotonic()
         for i, orgnr in enumerate(orgnrs, 1):
@@ -67,6 +77,9 @@ class Pipeline:
                 log.warning("Budget exhausted; stopping after %d profiles", i - 1)
                 break
             profiles.append(self.build_profile(orgnr))
+            if run_dir and i % save_every == 0:
+                save_profiles(profiles, run_dir)
+                log.info("checkpoint: %d profiles saved (%.0fs elapsed)", i, time.monotonic() - started)
             if i % 25 == 0:
                 log.info(
                     "progress %d/%d (%.0fs elapsed)",
@@ -209,7 +222,7 @@ class Pipeline:
                 self._jobs_cache = self.nav.collect_jobs_by_orgnr(
                     max_pages=2, detail_budget=detail_budget
                 )
-            except Exception as exc:  # feed is optional; never fail the run
+            except Exception as exc:  # noqa: BLE001 - feed is optional; never fail the run
                 log.warning("NAV feed unavailable: %s", exc)
                 self._jobs_cache = {}
         return self._jobs_cache
