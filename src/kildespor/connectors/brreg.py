@@ -64,7 +64,10 @@ def _dig(obj: Any, path: str) -> Any:
 class BrregConnector:
     def __init__(self, client: PoliteClient):
         self.client = client
-        self.base = client.base_url if hasattr(client, "base_url") else "https://data.brreg.no"
+        self.base = "https://data.brreg.no"
+        # sha256 of the most recent successful response (evidence linkage).
+        # Safe because the pipeline is strictly sequential per profile.
+        self.last_snapshot_sha256: str | None = None
 
     # ------------------------------------------------------------------
     # Entity lookup
@@ -72,6 +75,7 @@ class BrregConnector:
     def fetch_entity(self, orgnr: str) -> dict[str, Any] | None:
         url = f"{self.base}/enhetsregisteret/api/enheter/{orgnr}"
         resp = self.client.get(url)
+        self.last_snapshot_sha256 = resp.snapshot_sha256 if resp else None
         if resp is None or resp.status != 200:
             return None
         try:
@@ -86,6 +90,7 @@ class BrregConnector:
     def fetch_regnskap(self, orgnr: str) -> list[dict[str, Any]] | None:
         url = f"{self.base}/regnskapsregisteret/regnskap/{orgnr}"
         resp = self.client.get(url)
+        self.last_snapshot_sha256 = resp.snapshot_sha256 if resp else None
         if resp is None or resp.status != 200:
             return None
         try:
@@ -116,7 +121,11 @@ class BrregConnector:
     # Deterministic extraction into facts
     # ------------------------------------------------------------------
     def extract_entity_facts(
-        self, orgnr: str, payload: dict[str, Any], source_url: str
+        self,
+        orgnr: str,
+        payload: dict[str, Any],
+        source_url: str,
+        snapshot_sha256: str | None = None,
     ) -> list[Fact]:
         today = utc_today()
         facts: list[Fact] = []
@@ -137,7 +146,7 @@ class BrregConnector:
                         source_url=source_url,
                         retrieved_date=today,
                         evidence=path,
-                        snapshot_sha256=None,  # filled by the profile builder
+                        snapshot_sha256=snapshot_sha256,
                     ),
                 )
             )
@@ -156,7 +165,11 @@ class BrregConnector:
     }
 
     def extract_financial_facts(
-        self, orgnr: str, record: dict[str, Any], source_url: str
+        self,
+        orgnr: str,
+        record: dict[str, Any],
+        source_url: str,
+        snapshot_sha256: str | None = None,
     ) -> list[Fact]:
         today = utc_today()
         facts: list[Fact] = []
@@ -165,22 +178,18 @@ class BrregConnector:
             if value is None:
                 facts.append(Fact.unavailable(field, f"not disclosed in filed accounts ({path})"))
                 continue
-            if field == "fiscal_year_end" or field == "currency":
-                facts.append(
-                    Fact(
-                        field=field,
-                        value=value,
-                        source=Source(source_url=source_url, retrieved_date=today, evidence=path),
-                    )
-                )
-                continue
-            # Numeric financial value: keep it verbatim (never rounded, never
-            # derived) — only exact filed numbers are publishable.
+            # Keep values verbatim (never rounded, never derived) — only exact
+            # filed numbers are publishable.
             facts.append(
                 Fact(
                     field=field,
                     value=value,
-                    source=Source(source_url=source_url, retrieved_date=today, evidence=path),
+                    source=Source(
+                        source_url=source_url,
+                        retrieved_date=today,
+                        evidence=path,
+                        snapshot_sha256=snapshot_sha256,
+                    ),
                 )
             )
         return facts

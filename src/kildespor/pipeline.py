@@ -115,8 +115,11 @@ class Pipeline:
             self.stats["entity_failures"] = self.stats.get("entity_failures", 0) + 1
             return profile
 
-        # --- Entity facts
-        for fact in self.brreg.extract_entity_facts(orgnr, entity, f"{ENTITY_URL}/{orgnr}"):
+        # --- Entity facts (evidence-linked to the snapshotted response)
+        for fact in self.brreg.extract_entity_facts(
+            orgnr, entity, f"{ENTITY_URL}/{orgnr}",
+            snapshot_sha256=self.brreg.last_snapshot_sha256,
+        ):
             profile.add(fact)
 
         # --- Financial facts (identity-guarded; skipped for non-filing forms)
@@ -131,7 +134,10 @@ class Pipeline:
                 record = self.brreg.pick_regnskap(records, orgnr)
                 if record is not None:
                     fin_url = f"{CONFIG.brreg_base}/regnskapsregisteret/regnskap/{orgnr}"
-                    for fact in self.brreg.extract_financial_facts(orgnr, record, fin_url):
+                    for fact in self.brreg.extract_financial_facts(
+                        orgnr, record, fin_url,
+                        snapshot_sha256=self.brreg.last_snapshot_sha256,
+                    ):
                         profile.add(fact)
                 else:
                     profile.add(Fact.unavailable("annual_accounts", "no account record with matching orgnr"))
@@ -141,11 +147,17 @@ class Pipeline:
         # --- Website identity gate
         self._resolve_website(profile, entity)
 
-        # --- Hiring signal from NAV feed (orgnr-keyed)
+        # --- Hiring signal from NAV feed (orgnr-keyed; private tier only)
         jobs = self._nav_jobs().get(orgnr)
         if jobs:
             for fact in self.nav.hiring_facts(orgnr, jobs):
                 profile.add(fact)
+        elif not self.nav.private_token:
+            profile.add(Fact.unavailable(
+                "active_job_postings",
+                "NAV public feed cannot identify employers by orgnr; "
+                "hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)",
+            ))
         else:
             profile.add(Fact.unavailable("active_job_postings", "no active NAV ads for this orgnr"))
 
@@ -178,6 +190,7 @@ class Pipeline:
                         retrieved_date=utc_today(),
                         evidence=f"website:{result.gate}",
                         gate=result.gate,
+                        snapshot_sha256=result.snapshot_sha256,
                     ),
                     note=result.reason,
                 )
@@ -192,14 +205,20 @@ class Pipeline:
         if reg_url:
             # Registry-filed homepage: G3 compares hostnames without any fetch;
             # only an explicitly non-matching registry value needs page checks.
+            name_fact = profile.get("company_name")
+            postal_fact = profile.get("postal_code")
+            address_fact = profile.get("business_address")
             result = evaluate_website(
                 candidate_url=reg_url,
                 orgnr=orgnr,
-                legal_name=str(profile.get("company_name").value or ""),
-                postal_code=(profile.get("postal_code").value if profile.get("postal_code") else None),
-                street_address=(profile.get("business_address").value if profile.get("business_address") else None),
+                legal_name=str(name_fact.value) if name_fact else "",
+                postal_code=str(postal_fact.value) if postal_fact and postal_fact.status == "ok" else None,
+                street_address=(
+                    str(address_fact.value) if address_fact and address_fact.status == "ok" else None
+                ),
                 registry_homepage=reg_url,
                 client=self.client,
+                registry_snapshot_sha256=self.brreg.last_snapshot_sha256,
             )
             if result.passed:
                 _publish(reg_url, result)

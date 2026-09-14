@@ -1,17 +1,26 @@
-"""NAV job vacancy feed connector (Arbeidsplassen.no public feed).
+"""NAV job vacancy feed connector (Arbeidsplassen.no).
 
-Verified live on 2026-09-14:
-  GET {base}/api/publicToken   -> plain-text rotating public JWT
-  GET {base}/api/v1/feed       -> feed page (jsonfeed), bearer auth required
-  items[].url                  -> vacancy detail URL (absolute)
+Status (verified live 2026-09-14):
 
-We use the feed to add *hiring signal* facts keyed by the employer's org
-number (``json.employer.orgnr``), which NAV publishes directly — so the
-match is by the official number, never by name similarity.
+  The public feed (``/api/v1/feed`` with the rotating public token) serves
+  only truncated entries: ``_feed_entry`` carries businessName/municipal but
+  NO organisation number, and the public ``/feedentry/{uuid}`` detail payload
+  is empty (``{sistEndret, status, uuid}`` only).  The orgnr lives in the
+  private detail tier (``json.employer.orgnr``), which requires a consumer
+  agreement (email plattform.for.arbeidsmarkedet@nav.no).
+
+Kildespor's identity rule is orgnr-exact or nothing — so by default this
+connector spends ZERO requests and reports hiring facts as ``not_available``
+("source cannot identify employers by orgnr at public tier").
+
+If ``NAV_PRIVATE_TOKEN`` is set (consumer agreement with NAV), the connector
+scans the feed + detail payloads and keys facts strictly by the published
+``json.employer.orgnr``.  Names are never matched.
 """
 from __future__ import annotations
 
 import logging
+import os
 import time
 from typing import Any
 
@@ -29,6 +38,7 @@ class NavFeedConnector:
         self.base = base.rstrip("/")
         self._token: str | None = None
         self._token_ts: float = 0.0
+        self.private_token: str | None = os.environ.get("NAV_PRIVATE_TOKEN") or None
 
     # ------------------------------------------------------------------
     def _get_token(self) -> str | None:
@@ -49,7 +59,7 @@ class NavFeedConnector:
         return None
 
     def _authed_get(self, url: str, params: dict | None = None) -> Any | None:
-        token = self._get_token()
+        token = self.private_token or self._get_token()
         if token is None:
             return None
         resp = self.client.get(
@@ -68,13 +78,18 @@ class NavFeedConnector:
     def collect_jobs_by_orgnr(
         self, max_pages: int = 2, detail_budget: int = 60
     ) -> dict[str, list[dict]]:
-        """Scan a bounded number of feed pages, group ACTIVE ads by employer orgnr.
+        """Group ACTIVE ads by employer orgnr (private tier only).
 
-        The orgnr lives in the per-ad detail payload (``json.employer.orgnr``),
-        so we fetch details for at most ``detail_budget`` ads (strict request
-        budget).  We ONLY accept the official orgnr from that payload —
-        employer *names* are never matched, so a hit is always orgnr-exact.
+        Without a private token this returns ``{}`` immediately — the public
+        tier cannot yield orgnr-keyed facts, and we never name-match.
         """
+        if not self.private_token:
+            log.info(
+                "NAV feed: public tier carries no orgnr; skipping "
+                "(set NAV_PRIVATE_TOKEN to enable hiring facts)"
+            )
+            return {}
+
         by_orgnr: dict[str, list[dict]] = {}
         active_ads: list[dict] = []
         url: str | None = f"{self.base}/api/v1/feed"
@@ -90,7 +105,6 @@ class NavFeedConnector:
                 if entry.get("status") != "ACTIVE":
                     continue
                 active_ads.append(item)
-                # Some deployments expose orgnr directly on the entry
                 orgnr = str(entry.get("orgnr") or "").strip()
                 if orgnr:
                     by_orgnr.setdefault(orgnr, []).append(
@@ -115,6 +129,8 @@ class NavFeedConnector:
             if not isinstance(detail, dict):
                 continue
             payload = detail.get("json") or detail.get("ad_content") or detail
+            if not isinstance(payload, dict):
+                continue
             employer = payload.get("employer") or {}
             orgnr = str(employer.get("orgnr") or "").strip()
             if not orgnr:

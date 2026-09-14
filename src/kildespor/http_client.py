@@ -6,6 +6,7 @@ published fact can point to the literal response that supported it.
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import logging
 import os
@@ -31,6 +32,7 @@ class HttpResponse:
     content_type: str = ""
     snapshot_id: str | None = None
     snapshot_path: str | None = None
+    snapshot_sha256: str | None = None  # full sha256 of snapshotted bytes
     elapsed_ms: int = 0
 
     def json(self) -> Any:
@@ -161,6 +163,7 @@ class PoliteClient:
                 fh.write(payload)
             resp.snapshot_id = sid
             resp.snapshot_path = out_path
+            resp.snapshot_sha256 = hashlib.sha256(payload).hexdigest()
         except OSError as exc:
             log.warning("Could not write snapshot %s: %s", out_path, exc)
 

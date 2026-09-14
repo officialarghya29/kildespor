@@ -41,6 +41,9 @@ class GateResult:
     passed: bool
     reason: str
     checked_url: str
+    # sha256 of the snapshot backing the verdict: the page fetch for G1/G2,
+    # or the registry entity response for G3.
+    snapshot_sha256: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -146,6 +149,7 @@ def evaluate_website(
     street_address: str | None,
     registry_homepage: str | None,
     client: PoliteClient,
+    registry_snapshot_sha256: str | None = None,
 ) -> GateResult:
     """Decide whether candidate_url may be published as this company's website."""
     candidate_url = candidate_url.strip().rstrip("/")
@@ -160,6 +164,7 @@ def evaluate_website(
                 gate="G3_REGISTRY_LISTED", passed=True,
                 reason="homepage equals the registry-filed hjemmeside for this orgnr",
                 checked_url=candidate_url,
+                snapshot_sha256=registry_snapshot_sha256,
             )
 
     # Fetch the page (respecting robots.txt)
@@ -172,11 +177,13 @@ def evaluate_website(
             checked_url=candidate_url,
         )
     resp: HttpResponse | None = client.get(candidate_url, snap=True)
+    page_hash = resp.snapshot_sha256 if resp else None
     if resp is None or resp.status != 200:
         return GateResult(
             gate=None, passed=False,
             reason=f"page unreachable (status {getattr(resp, 'status', 'network-error')})",
             checked_url=candidate_url,
+            snapshot_sha256=page_hash,
         )
     html = resp.text
     combined = _visible_text(html) + " " + _jsonld_texts(html)
@@ -187,6 +194,7 @@ def evaluate_website(
             gate="G1_ORGNUMMER_ON_PAGE", passed=True,
             reason="organisation number appears on the page",
             checked_url=candidate_url,
+            snapshot_sha256=page_hash,
         )
 
     # --- G2: exact legal name AND matching postcode or street address
@@ -203,6 +211,7 @@ def evaluate_website(
             gate="G2_NAME_ADDRESS", passed=True,
             reason="exact legal name and matching address found on page",
             checked_url=candidate_url,
+            snapshot_sha256=page_hash,
         )
 
     # --- Anything else: ambiguous, never published

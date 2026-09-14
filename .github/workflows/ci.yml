@@ -17,8 +17,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install dev tooling
+        run: uv sync --extra dev
+
       - name: Lint
-        run: uvx ruff check src tests
+        run: uv run ruff check src tests
+
+      - name: Type check
+        run: uv run mypy src/kildespor --ignore-missing-imports
 
       - name: Run tests
         run: uv run pytest -q

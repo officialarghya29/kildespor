@@ -8,7 +8,13 @@ from kildespor.models import CompanyProfile, Fact, Source
 
 
 def _src(url="https://data.brreg.no/regnskapsregisteret/regnskap/925820148", gate=None):
-    return Source(source_url=url, retrieved_date=date(2026, 9, 14), evidence="x", gate=gate)
+    return Source(
+        source_url=url,
+        retrieved_date=date(2026, 9, 14),
+        evidence="x",
+        gate=gate,
+        snapshot_sha256="a" * 64,
+    )
 
 
 def _profile() -> CompanyProfile:

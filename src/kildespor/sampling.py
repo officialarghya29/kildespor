@@ -12,8 +12,8 @@ import hashlib
 import logging
 import os
 import random
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional
 
 import httpx
 
@@ -62,14 +62,14 @@ def download_bulk_csv(out_path: str, timeout: float = 600.0) -> str:
     return out_path
 
 
-def _find_orgnr_column(fieldnames: list[str]) -> str:
+def _find_orgnr_column(fieldnames: Sequence[str]) -> str:
     for name in fieldnames:
         if name and "organisasjonsnummer" in name.lower():
             return name
-    raise ValueError(f"no organisasjonsnummer column in {fieldnames!r}")
+    raise ValueError(f"no organisasjonsnummer column in {list(fieldnames)!r}")
 
 
-def _find_form_column(fieldnames: list[str]) -> Optional[str]:
+def _find_form_column(fieldnames: Sequence[str]) -> str | None:
     for name in fieldnames:
         if name and "organisasjonsform" in name.lower():
             return name
@@ -133,7 +133,7 @@ def sample_orgnrs(
     csv_path: str,
     n: int,
     seed: str = "kildespor-v1",
-    exclude_forms: Optional[set[str]] = None,
+    exclude_forms: set[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Reproducible sample: stable ordering + seeded RNG.
 
@@ -149,13 +149,10 @@ def sample_orgnrs(
         if exclude_forms and form in exclude_forms:
             continue
         universe.add(orgnr)
-    universe = sorted(universe)
+    ordered = sorted(universe)
     rng = random.Random(hashlib.sha256(seed.encode()).hexdigest())
-    if n >= len(universe):
-        picked = universe
-    else:
-        picked = rng.sample(universe, n)
-    picked.sort()
+    picked: list[str] = ordered if n >= len(ordered) else rng.sample(ordered, n)
+    picked = sorted(picked)
     manifest = {
         "source": BULK_URL,
         "seed": seed,

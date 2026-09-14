@@ -90,6 +90,8 @@ def validate_profile(p: CompanyProfile) -> list[str]:
             continue
         if fact.source is None:
             problems.append(f"{field}: published without source")
+        elif fact.source.snapshot_sha256 is None:
+            problems.append(f"{field}: published without snapshot hash")
         if field in FINANCIAL_FIELD_NAMES:
             url = fact.source.source_url if fact.source else ""
             if "/regnskapsregisteret/regnskap/" not in url:

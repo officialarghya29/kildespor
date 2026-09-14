@@ -7,7 +7,7 @@
 <p align="center">
   <a href="#-one-command-to-run-it"><img alt="run" src="https://img.shields.io/badge/one_command-uv_run_kildespor-4c1d3d?style=flat-square"></a>
   <a href="https://github.com/officialarghya29/kildespor/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/officialarghya29/kildespor/actions/workflows/ci.yml/badge.svg?style=flat-square"></a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-36_passing-2ea44f?style=flat-square">
+  <img alt="tests" src="https://img.shields.io/badge/tests-46_passing-2ea44f?style=flat-square">
   <img alt="cost" src="https://img.shields.io/badge/external_API_cost-%240.00-2ea44f?style=flat-square">
   <img alt="lint" src="https://img.shields.io/badge/ruff-clean-2ea44f?style=flat-square">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square">
@@ -45,6 +45,7 @@ is published that cannot be re-verified by a stranger from the artefacts alone.
 | Entity lookup failures | **0** |
 | Fabricated/typo'd orgnrs accepted | **0** (mod-11 pre-filter) |
 | Wrong-company financial publications | **0** (structurally impossible, §3.1) |
+| Facts missing a snapshot sha256 | **0** (every fact hash-linked to its raw response) |
 | Outbound requests | **~2.0/company** (cap: 2,000/day) |
 | External API cost | **$0.00** |
 
@@ -56,11 +57,18 @@ Field coverage across the 1,000-profile run:
 | `organisation_form` | 100% | `operating_revenue` (filed) | 63% |
 | `registered_date` | 100% | `postal_city` | 99% |
 | `industry_code` | 94% | `website` (gated) | 8.6%* |
+| `municipality` | 90% | `job_postings` | 0%** |
 | `municipality` | 90% | `employee_count` | 11% |
 
 \* The website gate is **precision-first by design**: only registry-listed domains are
 auto-verified (86 companies); every other candidate would need page-level proof. We
 publish nothing unverifiable — see §3.2.
+
+\** Verified live: the NAV **public** feed tier carries no organisation numbers (only
+employer names, which we never match) and its detail payloads are empty without a
+consumer agreement. Kildespor therefore spends **zero requests** on it and reports hiring
+facts as explicit `not_available`. Set `NAV_PRIVATE_TOKEN` (NAV consumer agreement,
+plattform.for.arbeidsmarkedet@nav.no) to enable orgnr-exact hiring facts.
 
 ---
 
@@ -150,6 +158,9 @@ spent on an entity that cannot exist.
 
 NAV ads are grouped by the employer orgnr **published inside each ad's detail payload**.
 An ad without an orgnr contributes to no company — employer *names* are never matched.
+Because the public feed tier serves no orgnrs at all (verified live), the connector is
+disabled by default rather than degrading to name-matching; a private-token agreement
+flips it on with the same guarantees.
 
 ---
 
@@ -251,20 +262,26 @@ retries and boundary cases.
 | Non-filing forms wasted ~40% of account lookups | Registry-form skip list | zero coverage loss, fewer 404s |
 | Misleading per-profile diagnostics | True per-profile request delta; entity/checksum counters | honest run reports |
 
-Additional guarantees verified by the test suite (36 tests): robots.txt honoured, digit-run
-substring orgnr matches rejected, every published fact traceable to `regnskapsregisteret`,
-ungated websites and source-less facts flagged, and a fact *cannot be constructed* without
-provenance (pydantic-level enforcement).
+Additional guarantees verified by the test suite (**46 tests**, including a fully mocked
+adversarial pipeline suite): robots.txt honoured, digit-run substring orgnr matches
+rejected, impostor filed-accounts records ignored, malformed registry payloads degrade to
+explicit `not_available`, budget exhaustion stops the run cleanly, every published fact is
+hash-linked to its snapshotted response, ungated websites and source-less facts are
+flagged, and a fact *cannot be constructed* without provenance (pydantic-level
+enforcement). Static typing is checked with mypy (14 modules, 0 issues).
 
 ---
 
 ## 7. CI
 
-Every push runs lint (ruff), the full test suite, and — when run artefacts are committed —
-the hard-fail validator over the latest run:
+Every push runs lint (pinned ruff), static type checks (mypy), the full test suite, and —
+when run artefacts are committed — the hard-fail validator over the latest run:
 
 ```yaml
-uvx ruff check src tests && uv run pytest -q && uv run kildespor validate
+uv run ruff check src tests
+uv run mypy src/kildespor --ignore-missing-imports
+uv run pytest -q
+uv run kildespor validate   # when a run is present
 ```
 
 ---
