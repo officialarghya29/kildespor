@@ -1,0 +1,188 @@
+{
+  "organisasjonsnummer": "838423302",
+  "generated_at": "2026-09-14T12:40:20.317706Z",
+  "facts": {
+    "company_name": {
+      "field": "company_name",
+      "value": "JOLYAS AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "navn",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form": {
+      "field": "organisation_form",
+      "value": "Aksjeselskap",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.beskrivelse",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form_code": {
+      "field": "organisation_form_code",
+      "value": "AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.kode",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_code": {
+      "field": "industry_code",
+      "value": "00.000",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.kode",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_description": {
+      "field": "industry_description",
+      "value": "Uoppgitt",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.beskrivelse",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "registered_date": {
+      "field": "registered_date",
+      "value": "2026-09-04",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registreringsdatoEnhetsregisteret",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "employee_count": {
+      "field": "employee_count",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (antallAnsatte)"
+    },
+    "registered_in_vat_registry": {
+      "field": "registered_in_vat_registry",
+      "value": false,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registrertIMvaregisteret",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "municipality": {
+      "field": "municipality",
+      "value": "ETNE",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.kommune",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "business_address": {
+      "field": "business_address",
+      "value": "Øredalsvegen 6",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.adresse",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_code": {
+      "field": "postal_code",
+      "value": "5593",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.postnummer",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_city": {
+      "field": "postal_city",
+      "value": "SKÅNEVIK",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/838423302",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.poststed",
+        "snapshot_sha256": "b3bb6b41168ef9bcda80933d30025de7de32c910baf259ffe04eec5bfe9a556e",
+        "gate": null
+      },
+      "note": null
+    },
+    "registry_homepage": {
+      "field": "registry_homepage",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (hjemmeside)"
+    },
+    "annual_accounts": {
+      "field": "annual_accounts",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no filed accounts returned"
+    },
+    "website": {
+      "field": "website",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no registry-listed homepage; discovery disabled"
+    },
+    "active_job_postings": {
+      "field": "active_job_postings",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "NAV public feed cannot identify employers by orgnr; hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)"
+    }
+  },
+  "changes": [],
+  "diagnostics": {
+    "requests_used": 2
+  }
+}

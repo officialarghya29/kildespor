@@ -1,0 +1,298 @@
+{
+  "organisasjonsnummer": "827075442",
+  "generated_at": "2026-09-14T12:39:32.861221Z",
+  "facts": {
+    "company_name": {
+      "field": "company_name",
+      "value": "ALGANOX AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "navn",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form": {
+      "field": "organisation_form",
+      "value": "Aksjeselskap",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.beskrivelse",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form_code": {
+      "field": "organisation_form_code",
+      "value": "AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.kode",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_code": {
+      "field": "industry_code",
+      "value": "72.100",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.kode",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_description": {
+      "field": "industry_description",
+      "value": "Forskning og eksperimentell utvikling innenfor naturvitenskap og teknikk",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.beskrivelse",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "registered_date": {
+      "field": "registered_date",
+      "value": "2021-05-06",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registreringsdatoEnhetsregisteret",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "employee_count": {
+      "field": "employee_count",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (antallAnsatte)"
+    },
+    "registered_in_vat_registry": {
+      "field": "registered_in_vat_registry",
+      "value": false,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registrertIMvaregisteret",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "municipality": {
+      "field": "municipality",
+      "value": "OSLO",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.kommune",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "business_address": {
+      "field": "business_address",
+      "value": "c/o Zaki Ahmed, Haugenstuveien 43",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.adresse",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_code": {
+      "field": "postal_code",
+      "value": "1084",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.postnummer",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_city": {
+      "field": "postal_city",
+      "value": "OSLO",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.poststed",
+        "snapshot_sha256": "050a393fc7d92097107cb849544e8e35535150dcc277432c26be857ab938df9e",
+        "gate": null
+      },
+      "note": null
+    },
+    "registry_homepage": {
+      "field": "registry_homepage",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (hjemmeside)"
+    },
+    "fiscal_year_end": {
+      "field": "fiscal_year_end",
+      "value": "2024-12-31",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "regnskapsperiode.tilDato",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "operating_revenue": {
+      "field": "operating_revenue",
+      "value": 973125.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.driftsresultat.driftsinntekter.sumDriftsinntekter",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "operating_result": {
+      "field": "operating_result",
+      "value": -85734.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.driftsresultat.driftsresultat",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "profit_before_tax": {
+      "field": "profit_before_tax",
+      "value": -87962.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.ordinaertResultatFoerSkattekostnad",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "annual_result": {
+      "field": "annual_result",
+      "value": -87962.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.aarsresultat",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_equity": {
+      "field": "total_equity",
+      "value": -641012.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.egenkapital.sumEgenkapital",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_liabilities": {
+      "field": "total_liabilities",
+      "value": 1067970.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.gjeldOversikt.sumGjeld",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_assets": {
+      "field": "total_assets",
+      "value": 426959.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "eiendeler.sumEiendeler",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "currency": {
+      "field": "currency",
+      "value": "NOK",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/827075442",
+        "retrieved_date": "2026-09-14",
+        "evidence": "valuta",
+        "snapshot_sha256": "f0da8556b3c224f8443afea27cec1ea2c56653bdb5262d36888edc699c6d50d1",
+        "gate": null
+      },
+      "note": null
+    },
+    "website": {
+      "field": "website",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no registry-listed homepage; discovery disabled"
+    },
+    "active_job_postings": {
+      "field": "active_job_postings",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "NAV public feed cannot identify employers by orgnr; hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)"
+    }
+  },
+  "changes": [],
+  "diagnostics": {
+    "requests_used": 2
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "organisasjonsnummer": "889171022",
+  "generated_at": "2026-09-14T12:40:38.563902Z",
+  "facts": {
+    "company_name": {
+      "field": "company_name",
+      "value": "NEVERLAND INVEST AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "navn",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form": {
+      "field": "organisation_form",
+      "value": "Aksjeselskap",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.beskrivelse",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form_code": {
+      "field": "organisation_form_code",
+      "value": "AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.kode",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_code": {
+      "field": "industry_code",
+      "value": "77.340",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.kode",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_description": {
+      "field": "industry_description",
+      "value": "Utleie og leasing av sjøtransportmateriell",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.beskrivelse",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "registered_date": {
+      "field": "registered_date",
+      "value": "2006-02-01",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registreringsdatoEnhetsregisteret",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "employee_count": {
+      "field": "employee_count",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (antallAnsatte)"
+    },
+    "registered_in_vat_registry": {
+      "field": "registered_in_vat_registry",
+      "value": false,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registrertIMvaregisteret",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "municipality": {
+      "field": "municipality",
+      "value": "LILLESAND",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.kommune",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "business_address": {
+      "field": "business_address",
+      "value": "c/o Morten Bogen, Justøyveien 535",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.adresse",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_code": {
+      "field": "postal_code",
+      "value": "4780",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.postnummer",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_city": {
+      "field": "postal_city",
+      "value": "BREKKESTØ",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.poststed",
+        "snapshot_sha256": "b004bac9856d106e46bc99a0953ccdca5fd97a399a50ee41a3611ff0780ebb53",
+        "gate": null
+      },
+      "note": null
+    },
+    "registry_homepage": {
+      "field": "registry_homepage",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (hjemmeside)"
+    },
+    "fiscal_year_end": {
+      "field": "fiscal_year_end",
+      "value": "2025-12-31",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "regnskapsperiode.tilDato",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "operating_revenue": {
+      "field": "operating_revenue",
+      "value": 26400.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.driftsresultat.driftsinntekter.sumDriftsinntekter",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "operating_result": {
+      "field": "operating_result",
+      "value": -41900.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.driftsresultat.driftsresultat",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "profit_before_tax": {
+      "field": "profit_before_tax",
+      "value": -184916.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.ordinaertResultatFoerSkattekostnad",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "annual_result": {
+      "field": "annual_result",
+      "value": 350765.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.aarsresultat",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_equity": {
+      "field": "total_equity",
+      "value": 4713250.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.egenkapital.sumEgenkapital",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_liabilities": {
+      "field": "total_liabilities",
+      "value": -76242.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.gjeldOversikt.sumGjeld",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_assets": {
+      "field": "total_assets",
+      "value": 4637008.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "eiendeler.sumEiendeler",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "currency": {
+      "field": "currency",
+      "value": "NOK",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/889171022",
+        "retrieved_date": "2026-09-14",
+        "evidence": "valuta",
+        "snapshot_sha256": "ea28e544bc43c2e9ab28c1bf9f8fca601893bcf884ba1bf6593cc16f7dabfa8a",
+        "gate": null
+      },
+      "note": null
+    },
+    "website": {
+      "field": "website",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no registry-listed homepage; discovery disabled"
+    },
+    "active_job_postings": {
+      "field": "active_job_postings",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "NAV public feed cannot identify employers by orgnr; hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)"
+    }
+  },
+  "changes": [],
+  "diagnostics": {
+    "requests_used": 2
+  }
+}

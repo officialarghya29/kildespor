@@ -1,0 +1,292 @@
+{
+  "organisasjonsnummer": "911798891",
+  "generated_at": "2026-09-14T12:40:59.861616Z",
+  "facts": {
+    "company_name": {
+      "field": "company_name",
+      "value": "FURULUND INVEST AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "navn",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form": {
+      "field": "organisation_form",
+      "value": "Aksjeselskap",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.beskrivelse",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form_code": {
+      "field": "organisation_form_code",
+      "value": "AS",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.kode",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_code": {
+      "field": "industry_code",
+      "value": "68.110",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.kode",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_description": {
+      "field": "industry_description",
+      "value": "Kjøp og salg av egen fast eiendom",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.beskrivelse",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "registered_date": {
+      "field": "registered_date",
+      "value": "2013-04-10",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registreringsdatoEnhetsregisteret",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "employee_count": {
+      "field": "employee_count",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (antallAnsatte)"
+    },
+    "registered_in_vat_registry": {
+      "field": "registered_in_vat_registry",
+      "value": false,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registrertIMvaregisteret",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "municipality": {
+      "field": "municipality",
+      "value": "ULLENSAKER",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.kommune",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "business_address": {
+      "field": "business_address",
+      "value": "Trondheimsvegen - Jessheim 500",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.adresse",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_code": {
+      "field": "postal_code",
+      "value": "2067",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.postnummer",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_city": {
+      "field": "postal_city",
+      "value": "JESSHEIM",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.poststed",
+        "snapshot_sha256": "6c0756f325eb647ae62f50f1916b869586d6a4efad81f94ec60c69f28a5d84e8",
+        "gate": null
+      },
+      "note": null
+    },
+    "registry_homepage": {
+      "field": "registry_homepage",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (hjemmeside)"
+    },
+    "fiscal_year_end": {
+      "field": "fiscal_year_end",
+      "value": "2025-12-31",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "regnskapsperiode.tilDato",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "operating_revenue": {
+      "field": "operating_revenue",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not disclosed in filed accounts (resultatregnskapResultat.driftsresultat.driftsinntekter.sumDriftsinntekter)"
+    },
+    "operating_result": {
+      "field": "operating_result",
+      "value": -118323.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.driftsresultat.driftsresultat",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "profit_before_tax": {
+      "field": "profit_before_tax",
+      "value": 3574567.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.ordinaertResultatFoerSkattekostnad",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "annual_result": {
+      "field": "annual_result",
+      "value": 3574567.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "resultatregnskapResultat.aarsresultat",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_equity": {
+      "field": "total_equity",
+      "value": 6142390.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.egenkapital.sumEgenkapital",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_liabilities": {
+      "field": "total_liabilities",
+      "value": 61597447.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "egenkapitalGjeld.gjeldOversikt.sumGjeld",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "total_assets": {
+      "field": "total_assets",
+      "value": 67739837.0,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "eiendeler.sumEiendeler",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "currency": {
+      "field": "currency",
+      "value": "NOK",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/regnskapsregisteret/regnskap/911798891",
+        "retrieved_date": "2026-09-14",
+        "evidence": "valuta",
+        "snapshot_sha256": "4992e869d606c5997ebf0b6f72b617fbf2098652554cfcfd5139ab91b48b0322",
+        "gate": null
+      },
+      "note": null
+    },
+    "website": {
+      "field": "website",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no registry-listed homepage; discovery disabled"
+    },
+    "active_job_postings": {
+      "field": "active_job_postings",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "NAV public feed cannot identify employers by orgnr; hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)"
+    }
+  },
+  "changes": [],
+  "diagnostics": {
+    "requests_used": 2
+  }
+}

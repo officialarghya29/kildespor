@@ -107,6 +107,9 @@ class Pipeline:
             return profile
 
         entity = self.brreg.fetch_entity(orgnr)
+        # The entity response is the evidence for both the entity facts AND
+        # the G3 website gate — capture it before any later call overwrites it.
+        entity_hash = self.brreg.last_snapshot_sha256
 
         if entity is None:
             profile.diagnostics["entity"] = "unreachable or unknown orgnr"
@@ -118,7 +121,7 @@ class Pipeline:
         # --- Entity facts (evidence-linked to the snapshotted response)
         for fact in self.brreg.extract_entity_facts(
             orgnr, entity, f"{ENTITY_URL}/{orgnr}",
-            snapshot_sha256=self.brreg.last_snapshot_sha256,
+            snapshot_sha256=entity_hash,
         ):
             profile.add(fact)
 
@@ -145,7 +148,7 @@ class Pipeline:
                 profile.add(Fact.unavailable("annual_accounts", "no filed accounts returned"))
 
         # --- Website identity gate
-        self._resolve_website(profile, entity)
+        self._resolve_website(profile, entity, entity_hash=entity_hash)
 
         # --- Hiring signal from NAV feed (orgnr-keyed; private tier only)
         jobs = self._nav_jobs().get(orgnr)
@@ -170,7 +173,13 @@ class Pipeline:
         return profile
 
     # ------------------------------------------------------------------
-    def _resolve_website(self, profile: CompanyProfile, entity: dict[str, Any]) -> None:
+    def _resolve_website(
+        self,
+        profile: CompanyProfile,
+        entity: dict[str, Any],
+        *,
+        entity_hash: str | None = None,
+    ) -> None:
         """Resolve + gate the website fact.  Registry homepage passes G3 directly."""
         orgnr = profile.organisasjonsnummer
         registry_homepage = profile.get("registry_homepage")
@@ -218,7 +227,7 @@ class Pipeline:
                 ),
                 registry_homepage=reg_url,
                 client=self.client,
-                registry_snapshot_sha256=self.brreg.last_snapshot_sha256,
+                registry_snapshot_sha256=entity_hash,
             )
             if result.passed:
                 _publish(reg_url, result)

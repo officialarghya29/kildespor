@@ -1,0 +1,188 @@
+{
+  "organisasjonsnummer": "815910052",
+  "generated_at": "2026-09-14T12:38:58.697368Z",
+  "facts": {
+    "company_name": {
+      "field": "company_name",
+      "value": "HOLMLI VASSLAG SA",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "navn",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form": {
+      "field": "organisation_form",
+      "value": "Samvirkeforetak",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.beskrivelse",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "organisation_form_code": {
+      "field": "organisation_form_code",
+      "value": "SA",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "organisasjonsform.kode",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_code": {
+      "field": "industry_code",
+      "value": "36.000",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.kode",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "industry_description": {
+      "field": "industry_description",
+      "value": "Uttak fra kilde, rensing og distribusjon av vann",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "naeringskode1.beskrivelse",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "registered_date": {
+      "field": "registered_date",
+      "value": "2016-04-14",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registreringsdatoEnhetsregisteret",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "employee_count": {
+      "field": "employee_count",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (antallAnsatte)"
+    },
+    "registered_in_vat_registry": {
+      "field": "registered_in_vat_registry",
+      "value": false,
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "registrertIMvaregisteret",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "municipality": {
+      "field": "municipality",
+      "value": "VERDAL",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.kommune",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "business_address": {
+      "field": "business_address",
+      "value": "Holmlibakkan 18",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.adresse",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_code": {
+      "field": "postal_code",
+      "value": "7660",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.postnummer",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "postal_city": {
+      "field": "postal_city",
+      "value": "VUKU",
+      "status": "ok",
+      "source": {
+        "source_url": "https://data.brreg.no/enhetsregisteret/api/enheter/815910052",
+        "retrieved_date": "2026-09-14",
+        "evidence": "forretningsadresse.poststed",
+        "snapshot_sha256": "9f5cacf32a91fbb7a5b8d8e3a39a3490bd306e73552b6f658cf73973ccfbb2af",
+        "gate": null
+      },
+      "note": null
+    },
+    "registry_homepage": {
+      "field": "registry_homepage",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "not present in entity payload (hjemmeside)"
+    },
+    "annual_accounts": {
+      "field": "annual_accounts",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no filed accounts returned"
+    },
+    "website": {
+      "field": "website",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "no registry-listed homepage; discovery disabled"
+    },
+    "active_job_postings": {
+      "field": "active_job_postings",
+      "value": null,
+      "status": "not_available",
+      "source": null,
+      "note": "NAV public feed cannot identify employers by orgnr; hiring facts require NAV_PRIVATE_TOKEN (consumer agreement)"
+    }
+  },
+  "changes": [],
+  "diagnostics": {
+    "requests_used": 2
+  }
+}
