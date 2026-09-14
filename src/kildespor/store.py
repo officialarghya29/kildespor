@@ -36,6 +36,8 @@ def load_profiles(profiles_dir: str) -> dict[str, CompanyProfile]:
     if not d.is_dir():
         return out
     for path in d.glob("*.json"):
+        if path.name.startswith("_"):
+            continue  # run summaries and other metadata live beside profiles
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             out[data["organisasjonsnummer"]] = CompanyProfile.model_validate(data)

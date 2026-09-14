@@ -8,6 +8,7 @@ from kildespor.connectors.brreg import (
     _dig,
     _normalise_homepage,
     normalise_orgnr,
+    orgnr_checksum_valid,
 )
 
 
@@ -80,3 +81,25 @@ def test_orgnr_normalisation():
 def test_homepage_normalisation():
     assert _normalise_homepage("brreg.no") == "https://brreg.no"
     assert _normalise_homepage("https://brreg.no/") == "https://brreg.no"
+
+
+def test_checksum_valid_for_real_orgnrs():
+    # Real registry numbers (Brreg itself, 7 FJELL, letvaks)
+    for orgnr in ("974760673", "925820148", "971035854"):
+        assert orgnr_checksum_valid(orgnr), orgnr
+
+
+def test_checksum_rejects_fabricated():
+    # Fabricated numbers that fail mod-11 (never spend a request on these)
+    for orgnr in ("921609699", "917752736", "971526155"):
+        assert not orgnr_checksum_valid(orgnr), orgnr
+
+
+def test_checksum_pass_does_not_guarantee_registration():
+    # 999999999 satisfies mod-11 but is not registered — the entity lookup
+    # still 404s; the checksum is a cheap pre-filter, not a membership test.
+    assert orgnr_checksum_valid("999999999")
+
+
+def test_checksum_grouped_digits_accepted():
+    assert orgnr_checksum_valid("925 820 148")

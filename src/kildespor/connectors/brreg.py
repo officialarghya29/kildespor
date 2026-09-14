@@ -202,6 +202,26 @@ def normalise_orgnr(raw: str) -> str:
     return digits
 
 
+def orgnr_checksum_valid(orgnr: str) -> bool:
+    """Mod-11 check digit validation for Norwegian organisation numbers.
+
+    Weights 3,2,7,6,5,4,3,2 over the first 8 digits; K = 11 - (S mod 11);
+    K == 11 maps to 0; K == 10 means the number is invalid.  Checking this
+    BEFORE any request avoids spending budget on typo'd/fabricated orgnrs.
+    """
+    orgnr = normalise_orgnr(orgnr)
+    digits = [int(c) for c in orgnr]
+    weights = [3, 2, 7, 6, 5, 4, 3, 2]
+    s = sum(d * w for d, w in zip(digits[:8], weights))
+    r = s % 11
+    k = 11 - r
+    if k == 11:
+        k = 0
+    if k == 10:
+        return False
+    return k == digits[8]
+
+
 # ---------------------------------------------------------------------------
 # Bulk universe (deterministic sampling)
 # ------------------------------------------------------------------

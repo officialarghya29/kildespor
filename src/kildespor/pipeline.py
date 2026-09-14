@@ -11,14 +11,12 @@ Budget-aware: stops gracefully when the request cap is hit.
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any, Optional
 
 from .config import CONFIG
-from .connectors.brreg import BrregConnector
+from .connectors.brreg import BrregConnector, orgnr_checksum_valid
 from .connectors.nav import NavFeedConnector
-from .differ import diff_profile
 from .http_client import PoliteClient
 from .identity import GateResult, evaluate_website
 from .models import CompanyProfile, Fact, Source, utc_today
@@ -28,9 +26,19 @@ log = logging.getLogger("kildespor.pipeline")
 ENTITY_URL = f"{CONFIG.brreg_base}/enhetsregisteret/api/enheter"
 
 # Org forms with no regnskapsplikt (statutory duty to file accounts) for the
-# accounts we consume — skipping the regnskap call for these saves ~40% of
-# the request budget with zero coverage loss (they can never have accounts).
-NON_FILING_FORMS = {"FLI", "ORGL", "SAM", "ESEK", "KTRF", "VOFO", "PMSA", "SAU"}
+# accounts we consume — skipping the regnskap call for these saves budget with
+# zero coverage loss (they can never have filed accounts there).
+# Only certain codes are listed; uncertain forms are queried anyway (worst case:
+# one 404 request), because a wrong skip would silently lose coverage.
+NON_FILING_FORMS = {
+    "FLI",   # forening/lag/innretning
+    "ORGL",  # organisasjonsledd (statlig organisasjonsledd)
+    "SAM",   # sameie
+    "ESEK",  # enkeltselskap (no separate legal personality)
+    "KTRF",  # kontorfellesskap
+    "VOFO",  # veldedig eller allmennyttig organisasjon
+    "ENK",   # enkeltpersonforetak (files via personal income tax, not RRR)
+}
 
 
 class Pipeline:
@@ -45,6 +53,8 @@ class Pipeline:
             "facts_unavailable": 0,
             "website_gate_pass": 0,
             "website_gate_ambiguous": 0,
+            "entity_failures": 0,
+            "checksum_rejected": 0,
             "requests_used": 0,
         }
 
@@ -68,12 +78,28 @@ class Pipeline:
     # ------------------------------------------------------------------
     def build_profile(self, orgnr: str) -> CompanyProfile:
         profile = CompanyProfile(organisasjonsnummer=orgnr)
+        requests_before = self.client.budget.used
+
+        # Cheap pre-filter: a number failing the mod-11 checksum cannot be a
+        # Norwegian orgnr — never spend a request (or a publication) on it.
+        if not orgnr_checksum_valid(orgnr):
+            profile.diagnostics["entity"] = (
+                "invalid organisation number (failed mod-11 checksum); no request spent"
+            )
+            profile.add(Fact.unavailable(
+                "company_name", "not a valid Norwegian organisation number (checksum)"
+            ))
+            self.stats["checksum_rejected"] = self.stats.get("checksum_rejected", 0) + 1
+            self.stats["profiles"] += 1
+            return profile
+
         entity = self.brreg.fetch_entity(orgnr)
 
         if entity is None:
             profile.diagnostics["entity"] = "unreachable or unknown orgnr"
-            profile.add(Fact.unavailable("company_name", "entity lookup failed"))
+            profile.add(Fact.unavailable("company_name", "entity lookup failed (unknown orgnr, budget exhausted, or source unreachable)"))
             self.stats["profiles"] += 1
+            self.stats["entity_failures"] = self.stats.get("entity_failures", 0) + 1
             return profile
 
         # --- Entity facts
@@ -115,7 +141,7 @@ class Pipeline:
         self.stats["facts_unavailable"] += sum(
             1 for f in profile.facts.values() if f.status == "not_available"
         )
-        profile.diagnostics["requests_by_host"] = dict(self.client.budget.by_host)
+        profile.diagnostics["requests_used"] = self.client.budget.used - requests_before
         return profile
 
     # ------------------------------------------------------------------
@@ -151,8 +177,8 @@ class Pipeline:
             self.stats["website_gate_ambiguous"] += 1
 
         if reg_url:
-            # Registry-filed homepage: verify with a fetch if budget allows,
-            # but treat registry listing as sufficient on its own (G3).
+            # Registry-filed homepage: G3 compares hostnames without any fetch;
+            # only an explicitly non-matching registry value needs page checks.
             result = evaluate_website(
                 candidate_url=reg_url,
                 orgnr=orgnr,
@@ -177,7 +203,12 @@ class Pipeline:
     def _nav_jobs(self) -> dict[str, list[dict]]:
         if self._jobs_cache is None:
             try:
-                self._jobs_cache = self.nav.collect_jobs_by_orgnr(max_pages=2)
+                remaining = self.client.budget.max_requests - self.client.budget.used
+                # Keep NAV's share within ~8% of the whole run's budget
+                detail_budget = max(0, min(60, remaining // 12))
+                self._jobs_cache = self.nav.collect_jobs_by_orgnr(
+                    max_pages=2, detail_budget=detail_budget
+                )
             except Exception as exc:  # feed is optional; never fail the run
                 log.warning("NAV feed unavailable: %s", exc)
                 self._jobs_cache = {}

@@ -222,8 +222,8 @@ Measured from the live smoke run (2026-09-14, 4 companies):
 
 | Metric | Value | Limit |
 |---|---|---|
-| Outbound requests per company (mean) | ~2.0 | — |
-| Projected requests for 1,000 companies | ~1,860 | 2,000/day |
+| Outbound requests per company (mean, incl. retry headroom) | ~2.0–2.5 | — |
+| Projected requests for 1,000 companies | ~2,300 worst case; ~1,900 typical | 2,000/day |
 | External API cost for 1,000 companies | **$0.00** | $10/day |
 | Wall time for 1,000 companies (0.3 s throttle) | ~12 min | 45 min |
 

@@ -20,7 +20,6 @@ from .config import CONFIG
 from .differ import diff_profile, summarise_changes
 from .explain import explain_profile, validate_profile
 from .http_client import PoliteClient
-from .models import CompanyProfile
 from .pipeline import Pipeline
 from .sampling import download_bulk_csv, sample_orgnrs
 from .store import latest_run_dir, load_profiles, save_profiles
@@ -66,7 +65,7 @@ def cmd_bootstrap(args: argparse.Namespace) -> int:
 
 def cmd_run(args: argparse.Namespace) -> int:
     sample_path = Path(CONFIG.data_dir) / "sample_orgnrs.json"
-    if args.n and not args.use_sample_file:
+    if args.n:
         csv_path = Path(CONFIG.data_dir) / "bulk" / "enheter.csv"
         if not csv_path.exists():
             log.info("no bulk CSV yet; running bootstrap first ...")
@@ -102,6 +101,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         "facts_unavailable": pipeline.stats["facts_unavailable"],
         "website_gate_pass": pipeline.stats["website_gate_pass"],
         "website_gate_ambiguous": pipeline.stats["website_gate_ambiguous"],
+        "entity_failures": pipeline.stats["entity_failures"],
+        "checksum_rejected": pipeline.stats["checksum_rejected"],
         "requests_used": pipeline.stats["requests_used"],
         "request_budget": CONFIG.max_requests,
         "elapsed_seconds": round(elapsed, 1),
@@ -176,7 +177,6 @@ def main(argv: list[str] | None = None) -> int:
     p_run = sub.add_parser("run", help="build profiles for the sample")
     p_run.add_argument("--n", type=int, default=0, help="sample size (0 = use saved sample file)")
     p_run.add_argument("--seed", default="kildespor-v1")
-    p_run.add_argument("--use-sample-file", action="store_true", default=True)
     p_run.add_argument("--run-dir", default=None)
     p_run.add_argument("--since-run", default=None, help="previous run dir to diff against")
     p_run.set_defaults(func=cmd_run)

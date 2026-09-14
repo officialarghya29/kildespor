@@ -6,9 +6,9 @@ published fact can point to the literal response that supported it.
 from __future__ import annotations
 
 import gzip
-import io
 import json
 import logging
+import os
 import time
 from dataclasses import dataclass, field as dc_field
 from typing import Any, Optional
@@ -20,8 +20,6 @@ from .config import CONFIG
 from .models import new_snapshot_id
 
 log = logging.getLogger("kildespor")
-
-SNAPSHOTS_DIR_NAME = "snapshots"
 
 
 @dataclass
@@ -59,7 +57,15 @@ class Budget:
 
 
 class PoliteClient:
-    """Single session, rate-limited, evidence-snapshotting HTTP client."""
+    """Single session, rate-limited, evidence-snapshotting HTTP client.
+
+    Transient failures (network errors, 429, 5xx) are retried with backoff;
+    every attempt — including retries — is charged to the request budget.
+    Definitive 4xx responses (404 etc.) are never retried.
+    """
+
+    RETRYABLE_STATUSES = {429, 500, 502, 503, 504}
+    MAX_ATTEMPTS = 3
 
     def __init__(self, snapshot_dir: Optional[str] = None):
         self._client = httpx.Client(
@@ -84,12 +90,35 @@ class PoliteClient:
         headers: Optional[dict[str, str]] = None,
         snap: bool = True,
     ) -> Optional[HttpResponse]:
-        """GET with budget enforcement, throttling, and snapshotting."""
-        host = urlparse(url).netloc
-        if not self.budget.try_spend(host):
-            log.warning("Request budget exhausted; refusing to call %s", url)
-            return None
+        """GET with budget enforcement, throttling, retries, and snapshots."""
+        for attempt in range(1, self.MAX_ATTEMPTS + 1):
+            host = urlparse(url).netloc
+            if not self.budget.try_spend(host):
+                log.warning("Request budget exhausted; refusing to call %s", url)
+                return None
+            out = self._get_once(url, params=params, headers=headers)
+            if out is not None and out.status not in self.RETRYABLE_STATUSES:
+                if out.status >= 400:
+                    log.info("HTTP %d for %s (no retry)", out.status, url)
+                return out
+            if attempt < self.MAX_ATTEMPTS:
+                backoff = 2.0 ** (attempt - 1)  # 1s, 2s
+                log.info(
+                    "transient failure for %s (attempt %d/%d); retrying in %.0fs",
+                    url, attempt, self.MAX_ATTEMPTS, backoff,
+                )
+                time.sleep(backoff)
+        log.warning("giving up on %s after %d attempts", url, self.MAX_ATTEMPTS)
+        return None
 
+    def _get_once(
+        self,
+        url: str,
+        *,
+        params: Optional[dict[str, Any]] = None,
+        headers: Optional[dict[str, str]] = None,
+    ) -> Optional[HttpResponse]:
+        host = urlparse(url).netloc
         wait = self.min_interval - (time.monotonic() - self._last_request_ts)
         if wait > 0:
             time.sleep(wait)
@@ -111,7 +140,7 @@ class PoliteClient:
             content_type=resp.headers.get("content-type", ""),
             elapsed_ms=elapsed_ms,
         )
-        if snap and resp.status_code == 200:
+        if resp.status_code == 200:
             self._snapshot(out)
         return out
 
@@ -127,8 +156,6 @@ class PoliteClient:
         sid = new_snapshot_id(payload)
         out_path = f"{self.snapshot_dir}/{sid}.{ext}"
         try:
-            import os
-
             os.makedirs(self.snapshot_dir, exist_ok=True)
             with open(out_path, "wb") as fh:
                 fh.write(payload)
